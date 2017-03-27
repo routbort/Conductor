@@ -1,0 +1,8 @@
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\bin\Debug\Conductor.Devices.PerceptionRackScanner.dll
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\bin\Debug\Conductor.Devices.PerceptionRackScanner.pdb
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\obj\Debug\Conductor.Devices.PerceptionRackScanner.csprojResolveAssemblyReference.cache
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\obj\Debug\Conductor.Devices.PerceptionRackScanner.csproj.GenerateResource.Cache
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\obj\Debug\Conductor.Devices.PerceptionRackScanner.dll
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\obj\Debug\Conductor.Devices.PerceptionRackScanner.pdb
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\obj\Debug\Conductor.Devices.PerceptionRackScanner.SimpleRackScanControl.resources
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.PerceptionRackScanner\obj\Debug\Conductor.Devices.PerceptionRackScanner.RackScanProgressControl.resources

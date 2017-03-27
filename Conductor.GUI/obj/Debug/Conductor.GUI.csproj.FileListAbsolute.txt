@@ -1,0 +1,16 @@
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\bin\Debug\Conductor.GUI.dll
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\bin\Debug\Conductor.GUI.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\bin\Debug\Conductor.Components.dll
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\bin\Debug\Conductor.Components.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.csprojResolveAssemblyReference.cache
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.CheckBox.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.CartesianGrid.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.DataGrid.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.TouchNumberInput.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.PopupPropertyViewer.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.Properties.Resources.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.PropertyViewer.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.TouchNumberInputForm.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.csproj.GenerateResource.Cache
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.dll
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.GUI\obj\Debug\Conductor.GUI.pdb

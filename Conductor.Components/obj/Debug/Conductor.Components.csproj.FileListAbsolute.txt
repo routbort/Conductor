@@ -1,0 +1,5 @@
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Components\bin\Debug\Conductor.Components.dll
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Components\bin\Debug\Conductor.Components.pdb
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Components\obj\Debug\Conductor.Components.csprojResolveAssemblyReference.cache
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Components\obj\Debug\Conductor.Components.dll
+C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Components\obj\Debug\Conductor.Components.pdb
