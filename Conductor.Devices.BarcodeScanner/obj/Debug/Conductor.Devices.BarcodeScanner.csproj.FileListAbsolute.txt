@@ -1,7 +1,0 @@
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\bin\Debug\Conductor.Devices.BarcodeScanner.dll
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\bin\Debug\Conductor.Devices.BarcodeScanner.pdb
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\obj\Debug\Conductor.Devices.BarcodeScanner.csprojResolveAssemblyReference.cache
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\obj\Debug\Conductor.Devices.BarcodeScanner.ConnectDevice.resources
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\obj\Debug\Conductor.Devices.BarcodeScanner.csproj.GenerateResource.Cache
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\obj\Debug\Conductor.Devices.BarcodeScanner.dll
-C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.BarcodeScanner\obj\Debug\Conductor.Devices.BarcodeScanner.pdb
