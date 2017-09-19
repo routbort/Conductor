@@ -5,3 +5,10 @@ C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.XTL96\bin\Debug\
 C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.XTL96\obj\Debug\Conductor.Devices.XTL96.csprojResolveAssemblyReference.cache
 C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.XTL96\obj\Debug\Conductor.Devices.XTL96.dll
 C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.XTL96\obj\Debug\Conductor.Devices.XTL96.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\bin\Debug\Conductor.Devices.XTL96.dll
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\bin\Debug\Conductor.Devices.XTL96.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\bin\Debug\Conductor.Devices.CABPrinter.exe
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\bin\Debug\Conductor.Devices.CABPrinter.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\obj\Debug\Conductor.Devices.XTL96.csprojResolveAssemblyReference.cache
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\obj\Debug\Conductor.Devices.XTL96.dll
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.XTL96\obj\Debug\Conductor.Devices.XTL96.pdb

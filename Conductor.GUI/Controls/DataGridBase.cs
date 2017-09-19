@@ -3,18 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace Conductor.GUI
 {
 
     public class DataGridBase : DataGridView
-    {
 
+    {  
+
+ 
+        public bool AutoSelectFirstRow { get; set; }
 
         private void CustomDataGridView_SelectionChanged(object sender, EventArgs e)
         {
-            ClearSelection();
+         // if (!_InternalSelectionInProgress)
+                ClearSelection();
         }
+
+
+        public delegate void SelectedRowChangedEventHandler(object sender, int SelectedRowIndex);
+
+        [Browsable(true)]
+        public event SelectedRowChangedEventHandler SelectedRowChanged;
 
         public int SelectedRowIndex
 
@@ -24,12 +35,30 @@ namespace Conductor.GUI
 
             set
             {
-                if (value < 0) return;
-                ClearHighlighting();
-                _SelectedRowIndex = value;
-                this.Rows[value].DefaultCellStyle.ForeColor =  this.DefaultCellStyle.SelectionForeColor; // System.Drawing.SystemColors.HighlightText;
-                this.Rows[value].DefaultCellStyle.BackColor =  this.DefaultCellStyle.SelectionBackColor;// System.Drawing.SystemColors.Highlight;
-                this.CurrentCell = this.Rows[value].Cells[0];
+
+                if (value < -1 || value >= this.Rows.Count) throw new ApplicationException("Indvalid row index specified");
+                int oldValue = _SelectedRowIndex;
+                //   if (value == -1  || value != _SelectedRowIndex)
+                if (true)
+                {
+                  
+                    ClearHighlighting();
+                    _SelectedRowIndex = value;
+                    if (value != -1)
+                    {
+                        this.Rows[value].DefaultCellStyle.ForeColor = this.DefaultCellStyle.SelectionForeColor; // System.Drawing.SystemColors.HighlightText;
+                        this.Rows[value].DefaultCellStyle.BackColor = this.DefaultCellStyle.SelectionBackColor;// System.Drawing.SystemColors.Highlight;
+                          this.CurrentCell = this.Rows[value].Cells[0];
+                      }
+                    else
+                    {
+                        //   _InternalSelectionInProgress = true;
+                        this.CurrentCell = null;
+                        //  _InternalSelectionInProgress = false;
+                    }
+                   if ( _SelectedRowIndex!= oldValue || _SelectedRowIndex ==-1)
+                        SelectedRowChanged?.Invoke(this, value);
+                }
             }
         }
 
@@ -54,8 +83,8 @@ namespace Conductor.GUI
 
         void ClearHighlighting()
         {
-          for (int i = 0; i < this.Rows.Count; i++)
-              UnhighlightRow(i);
+            for (int i = 0; i < this.Rows.Count; i++)
+                UnhighlightRow(i);
         }
 
         CheckedListBox _ColumnChooserCheckedListBox;
@@ -79,23 +108,26 @@ namespace Conductor.GUI
             _ColumnChooserWindow.Items.Add(controlHost);
             this.SelectionChanged += CustomDataGridView_SelectionChanged;
             this.CellClick += CustomDataGridView_CellClick;
+           
             this.DataSourceChanged += CustomDataGridView_DataSourceChanged;
-
+         
         }
 
- 
+
+
         private void CustomDataGridView_DataSourceChanged(object sender, EventArgs e)
         {
-            if (this.Rows.Count > 0)
+
+            if (AutoSelectFirstRow && this.Rows.Count > 0)
                 SelectedRowIndex = 0;
             else
-                _SelectedRowIndex = -1;
+                SelectedRowIndex = -1;
 
             ResetColumnVisibility();
         }
 
 
-        
+
 
         private void CustomDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -167,7 +199,7 @@ namespace Conductor.GUI
         {
             List<string> visible = new List<string>();
             if (_VisibleColumnList != null && _VisibleColumnList != "")
-                visible = _VisibleColumnList.Split(new char[] { ';',','}).ToList<string>();
+                visible = _VisibleColumnList.Split(new char[] { ';', ',' }).ToList<string>();
             foreach (DataGridViewColumn col in this.Columns)
                 col.Visible = (visible.Count == 0 || visible.Contains(col.Name));
         }

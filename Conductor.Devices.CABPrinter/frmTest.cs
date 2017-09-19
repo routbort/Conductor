@@ -14,7 +14,7 @@ namespace Conductor.Devices.CABPrinter
         public frmTest()
         {
             InitializeComponent();
-            this.txtTemplate.Text = CABLabelHelper.RackLabelTemplate;
+            this.txtTemplate.Text = CABLabelHelper.RackLabelTemplateExample;
             SimpleSubstitutionHolder holder = new SimpleSubstitutionHolder();
             this.propertyGrid1.SelectedObject = holder;
         }

@@ -12,3 +12,17 @@ C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.CABPrinter\obj\D
 C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.application
 C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.exe
 C:\Users\MJRoutbort\Source\Repos\MDLConductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\bin\Debug\Conductor.Devices.CABPrinter.exe.config
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.exe
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\bin\Debug\Conductor.Devices.CABPrinter.exe.manifest
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\bin\Debug\Conductor.Devices.CABPrinter.application
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\bin\Debug\Conductor.Devices.CABPrinter.exe
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\bin\Debug\Conductor.Devices.CABPrinter.pdb
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.csprojResolveAssemblyReference.cache
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.frmTest.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.Properties.Resources.resources
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.csproj.GenerateResource.Cache
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.TrustInfo.xml
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.exe.manifest
+C:\Users\MJRoutbort\Source\Repos\Conductor\Conductor.Devices.CABPrinter\obj\Debug\Conductor.Devices.CABPrinter.application

@@ -2,13 +2,8 @@
 using Conductor.Devices.PerceptionRackScanner;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Conductor.GUI.Examples;
 using System.Windows.Forms;
 
 namespace QuickExample
@@ -17,25 +12,8 @@ namespace QuickExample
     {
         delegate void SetCodeReadCallback(Code barcode);
         BarCodeWatcher _BCW;
-
-
-        public class SimpleTube : Conductor.GUI.IGridCellInformation
-        {
-            public string CurrentCartesianAddress
-            {
-                get; set;
-            }
-
-            public Color? GridCellBackColor
-            {
-                get; set;
-            }
-
-            public string GridCellLabel
-            {
-                get; set;
-            }
-        }
+        string _CurrentRackCode = null;
+        Dictionary<string, Dictionary<string, string>> _tubes = new Dictionary<string, Dictionary<string, string>>();
 
         public Form1()
         {
@@ -46,8 +24,6 @@ namespace QuickExample
             _BCW.CodeRead += _BCW_CodeRead;
             ShowMessage("Select store or check mode");
         }
-
-        string _CurrentRackCode = null;
 
         void HandleBarcodeScan(Code barcode)
         {
@@ -68,13 +44,11 @@ namespace QuickExample
                 return;
             }
 
-
             _CurrentRackCode = barcode.TextData;
             this.lblMessage.Visible = false;
             this.simpleRackScanControl1.Visible = true;
             this.simpleRackScanControl1.Scan();
         }
-
 
         private void _BCW_CodeRead(Code barcode)
         {
@@ -84,18 +58,16 @@ namespace QuickExample
             });
         }
 
-        Dictionary<string, Dictionary<string, string>> _tubes = new Dictionary<string, Dictionary<string, string>>();
-
         void HandleRackScan(RackScanResult data)
         {
             this.simpleRackScanControl1.Visible = false;
 
             Dictionary<string, string> currentTubes = new Dictionary<string, string>();
 
-            List<SimpleTube> tubes = new List<SimpleTube>();
+            List<Sample> tubes = new List<Sample>();
             foreach (var cell in data.Cells)
             {
-                SimpleTube tube = new SimpleTube();
+                Sample tube = new Sample();
                 tube.CurrentCartesianAddress = cell.Address;
                 currentTubes[cell.Address] = cell.Barcode;
                 tube.GridCellLabel = cell.Barcode;
@@ -131,7 +103,6 @@ namespace QuickExample
                         this.cartesianGrid1.SetOverlay(address, Color.Red, "EXTRA");
                         Error = true;
                     }
-
                 }
 
                 if (Error)
@@ -140,7 +111,6 @@ namespace QuickExample
                     ShowMessage("Error detected - Check tubes and try again", true);
                 }
                 else
-
                 {
                     SoundHelper.PlayWaveResource("WorkflowProgress.wav");
                     ShowMessage("All tubes match" + System.Environment.NewLine + "Ready for the next rack");
@@ -152,7 +122,6 @@ namespace QuickExample
 
         private void simpleRackScanControl1_RackScanned(RackScanResult data)
         {
-
             Invoke((MethodInvoker)delegate
             {
                 HandleRackScan(data);
@@ -160,14 +129,10 @@ namespace QuickExample
 
         }
 
-
-
-
         void ShowMessage(string Message, bool Error = false)
         {
             this.lblMessage.Text = Message;
             this.lblMessage.ForeColor = (Error) ? Color.Red : Color.Black;
-
             this.lblMessage.Visible = true;
 
         }
@@ -177,18 +142,14 @@ namespace QuickExample
             if (listBox1.SelectedIndex == 0)
             {
                 ShowMessage("Store into inventory" + System.Environment.NewLine + "Place rack on scanner and scan the rack bar code");
-
             }
-
             else
             {
                 ShowMessage("Check existing plate map" + System.Environment.NewLine + "Place rack on scanner and scan the rack bar code");
             }
-
             SoundHelper.PlayWaveResource("WorkflowInitiated.wav");
             this.cartesianGrid1.DataSource = null;
             this.Refresh();
-
         }
 
         private void button1_Click_2(object sender, EventArgs e)

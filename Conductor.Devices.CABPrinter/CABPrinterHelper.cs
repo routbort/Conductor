@@ -47,7 +47,14 @@ namespace Conductor.Devices.CABPrinter
             get
             {
                 throw new ApplicationException("Deprecated");
-                return @"e IMG;*
+              
+            }
+        }
+
+        public static string RackLabelTemplateExample
+
+        {
+            get { return @"e IMG;*
 ; LABEL ->  = C:\Labeler\TEST\Rack Label 3.stc
 ; CREATED: 10/4/2016 8:09:18 AM, Driver version: 1.0.0.288
 m m
@@ -66,8 +73,8 @@ B:Barcode1;3.03,22.01,0,datamatrix,0.5;VAR007
 T:Text7;2.86,2.88,0,3,1.83,k,q215;TEST
 T:Text1;12.06,3.99,270,5,1.7,b,q125;VAR002
 A 1
-";
-            }
+"; }
+
         }
 
         public static string BlankTemplate { get { return "f" + System.Environment.NewLine; } }

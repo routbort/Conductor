@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -19,7 +20,38 @@ namespace Conductor.GUI
             this.Grid.DisplayOnlyMode = false;
             this.Grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             SetCaptionVisibilites();
+            this.Grid.SelectionChanged += Grid_SelectionChanged;
+            this.Grid.SelectedRowChanged += Grid_SelectedRowChanged;
         }
+
+        private void Grid_SelectedRowChanged(object sender, int SelectedRowIndex)
+        {
+            SelectedRowChanged?.Invoke(this, SelectedRowIndex);
+        }
+
+        private void Grid_SelectionChanged(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Count " + this.Grid.SelectedRows.Count.ToString());
+            System.Diagnostics.Debug.WriteLine("Index " + this.Grid.SelectedRowIndex.ToString());
+            if (this.Grid.CurrentCell != null)
+                System.Diagnostics.Debug.WriteLine("Cell" + this.Grid.CurrentCell.RowIndex.ToString());
+            SelectionChanged?.Invoke(this, e);
+
+        }
+        public delegate void SelectedChangedEventHandler(object sender, EventArgs e);
+
+
+
+        public delegate void SelectedRowChangedEventHandler(object sender, int SelectedRowIndex);
+
+        [Browsable(true)]
+        public event SelectedRowChangedEventHandler SelectedRowChanged;
+
+
+
+        [Browsable(true)]
+        public event SelectedChangedEventHandler SelectionChanged;
+
 
         #region Property proxies
 
@@ -30,6 +62,13 @@ namespace Conductor.GUI
             {
                 dgv.SelectedRowIndex = value;
             }
+        }
+
+
+        public bool AutoSelectFirstRow
+        {
+            get { return dgv.AutoSelectFirstRow; }
+            set { dgv.AutoSelectFirstRow = value; }
         }
 
         public object DataSource
@@ -54,7 +93,7 @@ namespace Conductor.GUI
         void SetCaptionVisibilites()
         {
 
-            System.Diagnostics.Debug.WriteLine("Setting caption icon visibility");
+            //    System.Diagnostics.Debug.WriteLine("Setting caption icon visibility");
             this.pbChooser.Visible = (this.CaptionLabelVisible && AllowColumnChooser);
             this.cmdBigger.Visible = (this.CaptionLabelVisible && AllowScaleButtons);
             this.cmdSmaller.Visible = (this.CaptionLabelVisible && AllowScaleButtons);
@@ -135,6 +174,19 @@ namespace Conductor.GUI
         private void dgv_KeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
+            switch (e.KeyCode)
+            {
+
+                case Keys.Up:
+                    if (this.dgv.Rows.Count != 0 && SelectedRowIndex > 0)
+                        SelectedRowIndex--;
+                    break;
+                case Keys.Down:
+                    if (this.dgv.Rows.Count != 0 && SelectedRowIndex < this.dgv.Rows.Count - 1)
+                        SelectedRowIndex++;
+                    break;
+               
+            }
         }
 
         private void dgv_KeyPress(object sender, KeyPressEventArgs e)
