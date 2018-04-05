@@ -140,8 +140,9 @@ namespace QuickExample
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex == 0)
-            {
-                ShowMessage("Store into inventory" + System.Environment.NewLine + "Place rack on scanner and scan the rack bar code");
+            {           
+                //testing that DLL change is ignored
+                ShowMessage("Store into inventory " + System.Environment.NewLine + "Place rack on scanner and scan the rack bar code");
             }
             else
             {
@@ -156,6 +157,11 @@ namespace QuickExample
         {
             Code bc = new Code(this.txtBarcode.Text, Symbology.Code128);     
             this.HandleBarcodeScan(bc);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

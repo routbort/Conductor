@@ -45,6 +45,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\BarcodeEntryTextbox.cs">
@@ -68,6 +69,9 @@
     <Compile Include="Controls\DataGrid.Designer.cs">
       <DependentUpon>DataGrid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TouchButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\TouchNumberInput.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -76,6 +80,7 @@
     </Compile>
     <Compile Include="Examples\Sample.cs" />
     <Compile Include="Helpers\ColorHelper.cs" />
+    <Compile Include="Helpers\FontHelper.cs" />
     <Compile Include="Interfaces\ICartesianMapper.cs" />
     <Compile Include="Helpers\WinAPI.cs" />
     <Compile Include="Interfaces\ICartesianGridCellBoundItem.cs" />
@@ -105,6 +110,12 @@
     <Compile Include="Controls\RotatableLabel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\TouchButtonContainer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TouchButtonContainer.Designer.cs">
+      <DependentUpon>TouchButtonContainer.cs</DependentUpon>
+    </Compile>
     <Compile Include="TouchNumberInputForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -121,6 +132,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\DataGrid.resx">
       <DependentUpon>DataGrid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TouchButtonContainer.resx">
+      <DependentUpon>TouchButtonContainer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TouchNumberInput.resx">
       <DependentUpon>TouchNumberInput.cs</DependentUpon>

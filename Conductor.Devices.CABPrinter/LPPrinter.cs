@@ -20,7 +20,7 @@ namespace CABPrinter
         private string errormsg = "";
         private string logfile = "";
 
-        private long filesSend;
+      //  private long filesSend;
 
         private const int pport = 515;			// hard coded LPR/LPD port number
 
@@ -132,13 +132,13 @@ namespace CABPrinter
             }
         }
 
-        public long FilesSend
-        {
-            get
-            {
-                return filesSend;
-            }
-        }
+     //   public long FilesSend
+     //   {
+     //       get
+     //       {
+    //            return filesSend;
+    //        }
+    //    }
 
 
         #endregion properties

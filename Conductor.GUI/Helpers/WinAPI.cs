@@ -12,10 +12,31 @@ namespace Conductor.GUI
     {
         const int SM_CXDRAG = 68;
         const int SM_CYDRAG = 69;
+        const int WM_LBUTTONDOWN = 0x0201;
+        const int WM_LBUTTONUP = 0x0202;
+        const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        const int MOUSEEVENTF_LEFTUP = 0x04;
+
+
         [DllImport("user32.dll")]
         static extern int GetSystemMetrics(int index);
 
         public static Point GetDragThreshold() { return new Point(GetSystemMetrics(SM_CXDRAG), GetSystemMetrics(SM_CYDRAG)); }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+
+        public static void MouseDown()
+        {
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 50, 50, 0, 0);
+        }
+        public static void MouseUp()
+        {
+            mouse_event(MOUSEEVENTF_LEFTUP, 50, 50, 0, 0);
+        }
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();

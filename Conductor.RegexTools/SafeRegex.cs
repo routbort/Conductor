@@ -99,8 +99,11 @@ namespace Conductor.RegexTools
             Timeout = timeout;
         }
 
+        public bool MatchFound { get; private set; }
+
         public MatchCollection Matches(string input)
         {
+            MatchFound = false;
             _LastMatchExecutionTime = null;
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -113,6 +116,7 @@ namespace Conductor.RegexTools
             }
             sw.Stop();
             _LastMatchExecutionTime = sw.ElapsedMilliseconds;
+            MatchFound = (_matches.Count!=0);
             return _matches;
         }
 

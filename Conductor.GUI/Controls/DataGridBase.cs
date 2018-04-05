@@ -36,7 +36,7 @@ namespace Conductor.GUI
             set
             {
 
-                if (value < -1 || value >= this.Rows.Count) throw new ApplicationException("Indvalid row index specified");
+                if (value < -1 || value >= this.Rows.Count) throw new ApplicationException("Invalid row index specified");
                 int oldValue = _SelectedRowIndex;
                 //   if (value == -1  || value != _SelectedRowIndex)
                 if (true)

@@ -42,6 +42,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -62,6 +63,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Conductor.Components\Conductor.Components.csproj">
+      <Project>{8865a19c-2fde-49c1-a357-fd17a3d2318c}</Project>
+      <Name>Conductor.Components</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Conductor.Devices.CABPrinter\Conductor.Devices.CABPrinter.csproj">
       <Project>{983a5c41-c869-40a5-97bc-208e3e14d5ee}</Project>
       <Name>Conductor.Devices.CABPrinter</Name>

@@ -5,8 +5,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Conductor.GUI
 {
@@ -15,9 +17,141 @@ namespace Conductor.GUI
     {
 
 
+        public void RandomMoves()
+        {
+            bool Abort = System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.Escape);
+            BackgroundWorker bgw = new BackgroundWorker();
+            bgw.DoWork += RandomMovesWorker;
+            bgw.RunWorkerAsync();
+        }
+
+        private void RandomMovesWorker(object sender, DoWorkEventArgs e)
+        {
+
+            bool Abort = false;
+
+            while (!Abort)
+            {
+             //   Abort = System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.Escape);
+                while (_AnimationInProgress)
+                    System.Threading.Thread.Sleep(100);
+                RandomMove();
+
+            }
+
+
+        }
+
+        Point GetCellAddressPositionInWindowCoordinates(CartesianGridCell cell)
+        {
+            if (this.InvokeRequired)
+            {
+                return (Point)this.Invoke((Func<Point>)delegate
+                {
+                    return this.PointToScreen(Point.Round(cell.AddressPosition));
+                });
+            }
+            else
+                return this.PointToScreen(Point.Round(cell.AddressPosition));
+        }
+
+        public void RandomMove()
+        {
+            _AnimationInProgress = true;
+            Point initialPosition = Cursor.Position;
+            CartesianGridCell startCell = GetRandomFullCell();
+            CartesianGridCell finishCell = GetRandomEmptyCell();
+            if (startCell == null || finishCell == null)
+                return;
+
+
+            Point start = GetCellAddressPositionInWindowCoordinates(startCell);
+            Point finish = GetCellAddressPositionInWindowCoordinates(finishCell);
+
+
+            int duration = _Random.Next(200, 1200);
+            MouseMoveArgs args = new MouseMoveArgs() { duration = duration, start = start, finish = finish, initial = initialPosition };
+            BackgroundWorker bgw = new BackgroundWorker();
+            bgw.DoWork += MoveCellInternal;
+            bgw.RunWorkerAsync(args);
+        }
+
+        Random _Random = new Random();
+        bool _AnimationInProgress = false;
+
+
+        CartesianGridCell GetRandomFullCell()
+        {
+            if (_CellMapByObject.Keys.Count == 0)
+                return null;
+            return _CellMapByObject.ElementAt(_Random.Next(0, _CellMapByObject.Count)).Value;
+        }
+
+        CartesianGridCell GetRandomEmptyCell()
+        {
+            if (_CellMapByObject.Keys.Count == this.Capacity)
+                return null;
+            while (true)
+            {
+                int index = _Random.Next(0, this.Capacity - 1);
+                if (_CellMapByOrdinal[index].Item == null)
+                    return _CellMapByOrdinal[index];
+            }
+        }
+
+        class MouseMoveArgs
+        {
+
+            public int duration { get; set; }
+            public Point start { get; set; }
+            public Point finish { get; set; }
+            public Point initial { get; set; }
+        }
+
+
+        void MoveCellInternal(object sender, DoWorkEventArgs e)
+        {
+            MouseMoveArgs args = e.Argument as MouseMoveArgs;
+
+            Point start = args.start;
+            Cursor.Position = start;
+            Point newPosition = args.finish;
+            int duration_milliseconds = args.duration;
+            WinAPI.MouseDown();
+
+            // Find the vector between start and newPosition
+            float deltaX = newPosition.X - start.X;
+            float deltaY = newPosition.Y - start.Y;
+
+            // start a timer
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            float timeFraction = 0.0F;
+
+            do
+            {
+                timeFraction = (float)stopwatch.ElapsedMilliseconds / duration_milliseconds;
+                if (timeFraction > 1.0F)
+                    timeFraction = 1.0F;
+
+                PointF curPoint = new PointF(start.X + timeFraction * deltaX,
+                                             start.Y + timeFraction * deltaY);
+                Cursor.Position = Point.Round(curPoint);
+                Thread.Sleep(20);
+                
+       
 
 
 
+            } while (timeFraction < 1.0);
+
+            WinAPI.MouseUp();
+
+            Cursor.Position = args.initial;
+            _AnimationInProgress = false;
+
+        }
 
 
         public enum SelectionMode { None, SingleCell, MultipleCells }
@@ -63,7 +197,7 @@ namespace Conductor.GUI
                         Point upperLeft = _Cells[r.X, r.Y].Rectangle.Location;
                         Rectangle bottomRightRect = _Cells[r.X + r.Width, r.Y + r.Height].Rectangle;
                         Point bottomRight = new Point(bottomRightRect.Left + bottomRightRect.Width, bottomRightRect.Top + bottomRightRect.Height);
-                        int borderPadding = this.SelectedCellBorderWidth / 2;
+                        int borderPadding = this.SelectedCellBorderWidth / 4;
                         Rectangle targetBounds = new Rectangle(Math.Max(upperLeft.X - borderPadding, 0), Math.Max(upperLeft.Y - borderPadding, 0), bottomRight.X - upperLeft.X + 2 * borderPadding, bottomRight.Y - upperLeft.Y + 2 * borderPadding);
                         System.Drawing.Bitmap bmpWhole = new Bitmap(this.ClientRectangle.Width, this.ClientRectangle.Height);
                         this.DrawToBitmap(bmpWhole, this.ClientRectangle);
@@ -412,6 +546,7 @@ namespace Conductor.GUI
         int _SelectedCellBorderWidth = 4;
         int _SelectedCellBorderHalfWidth;
         int _SelectedCellBorderMiterWidth;
+        int _SelectedCellBorderMiterHalfWidth;
         Color _SelectedCellBorderColor = Color.BlueViolet;
         SelectionMode _CellSelectionMode;
         int _GridLineWidth = 1;
@@ -434,7 +569,6 @@ namespace Conductor.GUI
             List<string> results = new List<string>();
             for (int i = 0; i < this.Capacity; i++)
                 results.Add(this.Mapper.GetAddressFromOrdinal(i));
-
             return results;
         }
 
@@ -442,7 +576,6 @@ namespace Conductor.GUI
 
         void LayoutGrid(bool FillOrderChanged)
         {
-
             if (_Rows == 0 || _Columns == 0) { _Cells = null; return; }
             bool DimensionsChanged = false;
             if (_Cells == null || _Cells.GetLength(0) != _Columns || _Cells.GetLength(1) != _Rows)
@@ -518,78 +651,37 @@ namespace Conductor.GUI
 
         Rectangle GetLabelRect(Rectangle cellRectangle)
         {
-            int height = cellRectangle.Height - 2 * _CellPadding;
-            if (height < 1) height = 1;
-            int width = cellRectangle.Width - 2 * _CellPadding;
-            if (width < 1) width = 1;
+            int height = Math.Max(cellRectangle.Height - 2 * _CellPadding, 1);
+            int width = Math.Max(cellRectangle.Width - 2 * _CellPadding, 1);
             return new Rectangle(cellRectangle.X, cellRectangle.Y, width, height);
         }
 
-        Font GetFittingFont(Rectangle testRect, string testLabel, StringFormat format = null, string fontFamilyName = "Arial")
-        {
-            int size = 2;
-            int size_step = 2;
-            using (Graphics g = this.CreateGraphics())
-            {
-                do
-                {
-                    Font font = new Font(fontFamilyName, size, FontStyle.Regular, GraphicsUnit.Pixel);
-                    SizeF stringSize;
-                    if (format != null)
-                        stringSize = g.MeasureString(testLabel, font, testRect.Width, format);
-                    else
-                        stringSize = g.MeasureString(testLabel, font);
+        //Font GetFittingFont(Rectangle testRect, string testLabel, StringFormat format = null, string fontFamilyName = "Arial")
+        //{
+        //    int size = 2;
+        //    int size_step = 2;
+        //    using (Graphics g = this.CreateGraphics())
+        //    {
+        //        do
+        //        {
+        //            Font font = new Font(fontFamilyName, size, FontStyle.Regular, GraphicsUnit.Pixel);
+        //            SizeF stringSize;
+        //            if (format != null)
+        //                stringSize = g.MeasureString(testLabel, font, testRect.Width, format);
+        //            else
+        //                stringSize = g.MeasureString(testLabel, font);
+        //            font.Dispose();
+        //            if (stringSize.Height > testRect.Height || stringSize.Width > testRect.Width) break;
+        //            size += size_step;
+        //        } while (true);
+        //        g.Dispose();
+        //        int final_size = size - size_step;
+        //        if (final_size < 1) final_size = 1;
+        //        return new Font(fontFamilyName, final_size, FontStyle.Regular, GraphicsUnit.Pixel);
+        //    }
+        //}
 
-                    font.Dispose();
-                    if (stringSize.Height > testRect.Height || stringSize.Width > testRect.Width) break;
-                    size += size_step;
-                } while (true);
-                g.Dispose();
-                int final_size = size - size_step;
-                if (final_size < 1) final_size = 1;
-                return new Font(fontFamilyName, final_size, FontStyle.Regular, GraphicsUnit.Pixel);
-            }
-        }
 
-        Font GetFittingFont(Rectangle testRect, List<string> testLabels, StringFormat format = null, string fontFamilyName = "Arial")
-        {
-            if (testLabels.Count == 0) return null;
-            int size = 2;
-            int size_step = 2;
-            testRect.Width = testRect.Width - 2 * _CellPadding;
-            testRect.Height = testRect.Height - 2 * _CellPadding;
-            if (format == null)
-                format = new StringFormat();
-            //find widest label to start
-            using (Graphics g = this.CreateGraphics())
-            {
-                Font font = new Font(fontFamilyName, 20, FontStyle.Regular, GraphicsUnit.Pixel);
-                string maxLabel = "";
-                float maxWidth = 0f;
-                foreach (string testLabel in testLabels)
-                {
-                    SizeF stringSize = g.MeasureString(testLabel, font);
-                    if (stringSize.Width > maxWidth)
-                    {
-                        maxWidth = stringSize.Width;
-                        maxLabel = testLabel;
-                    }
-                }
-                font.Dispose();
-                do
-                {
-                    font = new Font(fontFamilyName, size, FontStyle.Regular, GraphicsUnit.Pixel);
-                    SizeF stringSize = g.MeasureString(maxLabel, font);
-                    font.Dispose();
-                    if (stringSize.Height > testRect.Height || stringSize.Width > testRect.Width) break;
-                    size += size_step;
-                } while (true);
-                g.Dispose();
-                int final_size = size - size_step;
-                if (final_size < 1) final_size = 1;
-                return new Font(fontFamilyName, final_size, FontStyle.Regular, GraphicsUnit.Pixel);
-            }
-        }
 
         protected List<string> CaptionOverlayOverrides { set; get; }
 
@@ -976,7 +1068,8 @@ namespace Conductor.GUI
             {
                 _SelectedCellBorderWidth = value;
                 _SelectedCellBorderHalfWidth = value / 2;
-                _SelectedCellBorderMiterWidth = Convert.ToInt32(Math.Truncate(1.42f * _SelectedCellBorderHalfWidth));
+                _SelectedCellBorderMiterHalfWidth = Convert.ToInt32(Math.Truncate(0.5 * value / Math.Sqrt(2)));
+                _SelectedCellBorderMiterWidth = _SelectedCellBorderMiterHalfWidth * 2;
             }
         }
 
@@ -1149,15 +1242,15 @@ namespace Conductor.GUI
                     if (CurrentIBindingList == null)
                         warning += " DataSource does not support IBindingList. ";
 
-                    List<object> _ObjectCache = new List<object>();
+                    var ObjectCache = new List<object>();
                     bool AllObjectsSupportCellBinding = true;
                     bool AllObjectsSupportINotifyPropertyChanged = true;
                     bool AllObjectsAreAssignableToBoundType = true;
                     foreach (object o in CurrentEnumerator)
                     {
-                        if (_ObjectCache.Contains(o))
+                        if (ObjectCache.Contains(o))
                             throw new Exception("Duplicate object binding not allowed.  Use shallow copies if you need to bind replicates.");
-                        _ObjectCache.Add(o);
+                        ObjectCache.Add(o);
                         if (!(o is IGridCellInformation))
                             AllObjectsSupportCellBinding = false;
                         else
@@ -1221,7 +1314,6 @@ namespace Conductor.GUI
                     _CellMapByOrdinal[i].OverlayColor = Color.Red;
                     _CellMapByOrdinal[i].OverlayCaption = "FILL VIOLATION";
                     ViolationFound = true;
-
                 }
 
                 if (_CellMapByOrdinal[i].Item == null)
@@ -1351,6 +1443,8 @@ namespace Conductor.GUI
 
         public void Repack()
         {
+            if (this.CurrentEnumerator == null)
+                return;
             ClearItems(true);
             int index = 0;
             foreach (var item in this.CurrentEnumerator)
@@ -1432,6 +1526,38 @@ namespace Conductor.GUI
 
         }
 
+        Color GetGridBackColor(CartesianGridCell cell)
+        {
+            var boundItem = cell.Item as IGridCellInformation;
+            if (boundItem != null && boundItem.GridCellBackColor.HasValue)
+                return boundItem.GridCellBackColor.Value;
+            else
+            {
+                var boundItem2 = cell.Item;
+                if (boundItem2 != null)
+                {
+                    Type objType = boundItem2.GetType();
+                    PropertyInfo myPropInfo = objType.GetProperty("BackColor");
+                    if (myPropInfo != null)
+                        return (System.Drawing.Color)myPropInfo.GetValue(boundItem2, null);
+                }
+            }
+
+            return Color.Transparent;
+        }
+
+        double GetDistanceBetweenPoints(Point A, Point B)
+
+        {
+
+            double dX = A.X - B.X;
+            double dY = A.Y - B.Y;
+            double multi = dX * dX + dY * dY;
+            return Math.Sqrt(multi);
+
+        }
+
+
         protected override void OnPaint(PaintEventArgs pe)
         {
 
@@ -1447,16 +1573,14 @@ namespace Conductor.GUI
                 using (Brush invalidBrush = new SolidBrush(Color.Red))
                 using (Brush eraseBrush = new SolidBrush(this.BackColor))
                 using (Pen erasePen = new Pen(this.BackColor, _SelectedCellBorderWidth))
-
                 using (Brush selectedBrush = new SolidBrush(this.SelectedCellBorderColor))
                 using (Brush selectedBrush2 = new HatchBrush(HatchStyle.Percent50, Color.White, this.SelectedCellBorderColor))
                 {
-
-
+                    erasePen.StartCap = LineCap.Flat;
+                    erasePen.EndCap = LineCap.Flat;
                     Font labelFont = null;
-
                     pe.Graphics.Clear(this.BackColor);
-                    erasePen.EndCap = System.Drawing.Drawing2D.LineCap.Square;
+                    //   erasePen.EndCap = System.Drawing.Drawing2D.LineCap.Square;
                     if (_Rows == 0 || _Columns == 0) return;
                     CartesianGridCell cell;
                     List<string> overlays = new List<string>();
@@ -1481,7 +1605,7 @@ namespace Conductor.GUI
                     if (ErrorText != null && ErrorText != "" && !HideErrors)
                     {
                         Rectangle captionRectangle = new Rectangle(0, 0, this.Width, this.ErrorCaptionHeight);
-                        Font captionFontNew = GetFittingFont(captionRectangle, ErrorText, null, "Consolas");
+                        Font captionFontNew = FontHelper.GetFittingFont(this, captionRectangle, ErrorText, null, "Consolas");
                         pe.Graphics.DrawString(ErrorText, captionFontNew, invalidBrush, captionRectangle, centeredFormat);
                         captionFontNew.Dispose();
                     }
@@ -1489,25 +1613,21 @@ namespace Conductor.GUI
                     if (_Text != null && _Text != "")
                     {
                         Rectangle captionRectangle = new Rectangle(0, (this.ErrorText != null && this.ErrorText != "" && !HideErrors) ? this.ErrorCaptionHeight : 0, this.Width, this.CaptionHeight);
-                        Font captionFontNew = GetFittingFont(captionRectangle, _Text, null, "Consolas");
+                        Font captionFontNew = FontHelper.GetFittingFont(this, captionRectangle, _Text, null, "Consolas");
                         pe.Graphics.DrawString(_Text, captionFontNew, fontBrush, captionRectangle, centeredFormat);
                         captionFontNew.Dispose();
                     }
 
-                    Font addressFont = GetFittingFont(GetAddressRect(_Cells[0, 0].Rectangle), _Cells[0, 0].Address, centeredFormat, this.Font.Name);
+                    Font addressFont = FontHelper.GetFittingFont(this, GetAddressRect(_Cells[0, 0].Rectangle), _Cells[0, 0].Address, centeredFormat, this.Font.Name);
 
-                    int backColorCount = 0;
                     for (int colIndex = 0; colIndex < _Columns; colIndex++)
                         for (int rowIndex = 0; rowIndex < _Rows; rowIndex++)
                         {
                             cell = _Cells[colIndex, rowIndex];
-                            var boundItem = cell.Item as IGridCellInformation;
-                            if (boundItem != null && boundItem.GridCellBackColor.HasValue)
-                            {
-                                backColorCount++;
-                                using (Brush backcolorBrush = new SolidBrush(boundItem.GridCellBackColor.Value))
+                            Color c = GetGridBackColor(cell);
+                            if (c != null)
+                                using (Brush backcolorBrush = new SolidBrush(c))
                                     pe.Graphics.FillRectangle(backcolorBrush, cell.Rectangle);
-                            }
                         }
 
                     //    Debug.WriteLine("Back color rectangles painted " + backColorCount.ToString());
@@ -1527,7 +1647,7 @@ namespace Conductor.GUI
                         }
 
                     cell = _Cells[0, 0];
-                    labelFont = GetFittingFont(GetLabelRect(cell.Rectangle), new List<string>(CellLabels.Values), centeredFormat, "Consolas");
+                    labelFont = FontHelper.GetFittingFont(this, GetLabelRect(cell.Rectangle), _CellPadding, new List<string>(CellLabels.Values), centeredFormat, "Consolas");
                     for (int colIndex = 0; colIndex < _Columns; colIndex++)
                         for (int rowIndex = 0; rowIndex < _Rows; rowIndex++)
                         {
@@ -1596,26 +1716,74 @@ namespace Conductor.GUI
 
                                     if (needsTopLeftCutout)
                                     {
-                                        Point topLeftJoin = new Point(cell.Rectangle.X - _SelectedCellBorderHalfWidth - _SelectedCellBorderMiterWidth, cell.Rectangle.Y - _SelectedCellBorderHalfWidth - _SelectedCellBorderMiterWidth);
-                                        Point bottomRightJoin = new Point(cell.Rectangle.X + _SelectedCellBorderHalfWidth, cell.Rectangle.Y + _SelectedCellBorderHalfWidth);
-                                        pe.Graphics.DrawLine(erasePen, topLeftJoin, bottomRightJoin);
+                                        Point ptTopLeft = new Point(cell.Rectangle.X - _SelectedCellBorderHalfWidth, cell.Rectangle.Y - _SelectedCellBorderHalfWidth);
+                                        Point ptBottomRight = new Point(cell.Rectangle.X + _SelectedCellBorderHalfWidth, cell.Rectangle.Y + _SelectedCellBorderHalfWidth);
+                                        Point ptLeft = new Point(ptTopLeft.X - _SelectedCellBorderMiterWidth, ptTopLeft.Y);
+                                        Point ptTop = new Point(ptTopLeft.X, ptTopLeft.Y - _SelectedCellBorderMiterWidth);
+                                        Point ptRight = new Point(ptBottomRight.X + _SelectedCellBorderMiterWidth, ptBottomRight.Y);
+                                        Point ptBottom = new Point(ptBottomRight.X, ptBottomRight.Y + _SelectedCellBorderMiterWidth);
+                                        CartesianGridCell partnerCell = _Cells[cell.ColIndex - 1, cell.RowIndex - 1];
+                                        int _SelectedCellBorderMiterHalfWidth = _SelectedCellBorderMiterWidth / 2;
+                                        Point ptLeftSub = new Point(ptLeft.X + _SelectedCellBorderMiterHalfWidth, ptLeft.Y + _SelectedCellBorderMiterHalfWidth);
+                                        Point ptTopSub = new Point(ptTop.X + _SelectedCellBorderMiterHalfWidth, ptTop.Y + _SelectedCellBorderMiterHalfWidth);
+                                        Point ptRightSub = new Point(ptRight.X - _SelectedCellBorderMiterHalfWidth, ptRight.Y - _SelectedCellBorderMiterHalfWidth);
+                                        Point ptBottomSub = new Point(ptBottom.X - _SelectedCellBorderMiterHalfWidth, ptBottom.Y - _SelectedCellBorderMiterHalfWidth);
+                                        Point ptGradientStart = new Point(ptLeftSub.X - 1, ptLeftSub.Y - 1);
+                                        Point ptGradientFinish = new Point(ptBottomSub.X + 1, ptBottomSub.Y + 1);
+                                        using (LinearGradientBrush linGrBrush = new LinearGradientBrush(ptGradientStart, ptGradientFinish, GetGridBackColor(partnerCell), GetGridBackColor(cell)))
+                                            pe.Graphics.FillPolygon(linGrBrush, new Point[] { ptLeft, ptTopLeft, ptTop, ptRight, ptBottomRight, ptBottom });
+                                        using (var FillBrush = new SolidBrush(GetGridBackColor(partnerCell)))
+                                        {
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptTop, ptTopSub, ptTopLeft });
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptLeft, ptLeftSub, ptTopLeft });
+                                        }
+                                        using (var FillBrush = new SolidBrush(GetGridBackColor(cell)))
+                                        {
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptRight, ptRightSub, ptBottomRight });
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptBottom, ptBottomSub, ptBottomRight });
+                                        }
                                     }
 
                                     if (needsBottomLeftCutout)
                                     {
-                                        Point topRightJoin = new Point(cell.Rectangle.X + _SelectedCellBorderHalfWidth + _SelectedCellBorderMiterWidth, cell.Rectangle.Y + cell.Rectangle.Height - _SelectedCellBorderHalfWidth - _SelectedCellBorderMiterWidth);
-                                        Point bottomLeftJoin = new Point(cell.Rectangle.X - _SelectedCellBorderHalfWidth, cell.Rectangle.Y + cell.Rectangle.Height + _SelectedCellBorderHalfWidth);
-                                        pe.Graphics.DrawLine(erasePen, topRightJoin, bottomLeftJoin);
+                                        int _SelectedCellBorderMiterHalfWidth = _SelectedCellBorderMiterWidth / 2;
+                                        Point ptTopRight = new Point(cell.Rectangle.X + _SelectedCellBorderHalfWidth, cell.Rectangle.Y + cell.Rectangle.Height - _SelectedCellBorderHalfWidth);
+                                        Point ptBottomLeft = new Point(cell.Rectangle.X - _SelectedCellBorderHalfWidth, cell.Rectangle.Y + cell.Rectangle.Height + _SelectedCellBorderHalfWidth);
+                                        Point ptLeft = new Point(ptBottomLeft.X - _SelectedCellBorderMiterWidth, ptBottomLeft.Y);
+                                        Point ptTop = new Point(ptTopRight.X, ptTopRight.Y - _SelectedCellBorderMiterWidth);
+                                        Point ptRight = new Point(ptTopRight.X + _SelectedCellBorderMiterWidth, ptTopRight.Y);
+                                        Point ptBottom = new Point(ptBottomLeft.X, ptBottomLeft.Y + _SelectedCellBorderMiterWidth);
+                                        Point ptLeftSub = new Point(ptLeft.X + _SelectedCellBorderMiterHalfWidth, ptLeft.Y - _SelectedCellBorderMiterHalfWidth);
+                                        Point ptTopSub = new Point(ptTop.X - _SelectedCellBorderMiterHalfWidth, ptTop.Y + _SelectedCellBorderMiterHalfWidth);
+                                        Point ptRightSub = new Point(ptRight.X - _SelectedCellBorderMiterHalfWidth, ptRight.Y + _SelectedCellBorderMiterHalfWidth);
+                                        Point ptBottomSub = new Point(ptBottom.X + _SelectedCellBorderMiterHalfWidth, ptBottom.Y - _SelectedCellBorderMiterHalfWidth);
+                                        CartesianGridCell partnerCell = _Cells[cell.ColIndex - 1, cell.RowIndex + 1];
+                                        Point ptGradientStart = new Point(ptLeftSub.X - 1, ptLeftSub.Y + 1);
+                                        Point ptGradientFinish = new Point(ptTopSub.X + 1, ptTopSub.Y - 1);
+                                        using (LinearGradientBrush linGrBrush = new LinearGradientBrush(ptGradientStart, ptGradientFinish, GetGridBackColor(partnerCell), GetGridBackColor(cell)))
+                                            pe.Graphics.FillPolygon(linGrBrush, new Point[] { ptLeft, ptTop, ptTopRight, ptRight, ptBottom, ptBottomLeft });
+                                        using (var FillBrush = new SolidBrush(GetGridBackColor(cell)))
+                                        {
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptTop, ptTopSub, ptTopRight });
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptRight, ptRightSub, ptTopRight });
+                                        }
+                                        using (var FillBrush = new SolidBrush(GetGridBackColor(partnerCell)))
+                                        {
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptLeft, ptLeftSub, ptBottomLeft });
+                                            pe.Graphics.FillPolygon(FillBrush, new Point[] { ptBottom, ptBottomSub, ptBottomLeft });
+                                        }
                                     }
+
+
                                 }
                             }
 
 
                     Font overlayFont = null;
                     if (CaptionOverlayOverrides != null)
-                        overlayFont = GetFittingFont(GetLabelRect(cell.Rectangle), CaptionOverlayOverrides, centeredFormat, "Consolas");
+                        overlayFont = FontHelper.GetFittingFont(this, GetLabelRect(cell.Rectangle), _CellPadding, CaptionOverlayOverrides, centeredFormat, "Consolas");
                     else
-                        overlayFont = GetFittingFont(GetLabelRect(cell.Rectangle), overlays, centeredFormat, "Consolas");
+                        overlayFont = FontHelper.GetFittingFont(this, GetLabelRect(cell.Rectangle), _CellPadding, overlays, centeredFormat, "Consolas");
 
 
                     for (int colIndex = 0; colIndex < _Columns; colIndex++)

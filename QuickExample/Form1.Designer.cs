@@ -33,9 +33,9 @@
             this.simpleRackScanControl1 = new Conductor.Devices.PerceptionRackScanner.SimpleRackScanControl();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.txtBarcode = new System.Windows.Forms.TextBox();
             this.cmdSimulateScan = new System.Windows.Forms.Button();
             this.lblMessage = new System.Windows.Forms.Label();
-            this.txtBarcode = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -119,6 +119,14 @@
             this.splitContainer1.SplitterDistance = 160;
             this.splitContainer1.TabIndex = 5;
             // 
+            // txtBarcode
+            // 
+            this.txtBarcode.Location = new System.Drawing.Point(74, 92);
+            this.txtBarcode.Name = "txtBarcode";
+            this.txtBarcode.Size = new System.Drawing.Size(83, 20);
+            this.txtBarcode.TabIndex = 5;
+            this.txtBarcode.Text = "1234";
+            // 
             // cmdSimulateScan
             // 
             this.cmdSimulateScan.Location = new System.Drawing.Point(4, 90);
@@ -140,14 +148,6 @@
             this.lblMessage.Text = "Message";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // txtBarcode
-            // 
-            this.txtBarcode.Location = new System.Drawing.Point(74, 92);
-            this.txtBarcode.Name = "txtBarcode";
-            this.txtBarcode.Size = new System.Drawing.Size(83, 20);
-            this.txtBarcode.TabIndex = 5;
-            this.txtBarcode.Text = "1234";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -157,6 +157,7 @@
             this.Controls.Add(this.cartesianGrid1);
             this.Name = "Form1";
             this.Text = "Simple Store & Check Example";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);

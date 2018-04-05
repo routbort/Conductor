@@ -99,7 +99,7 @@ namespace Conductor.GUI
         }
 
 
-        private int? _Value;
+      //  private int? _Value;
 
         public int? Value
         {

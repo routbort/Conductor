@@ -198,8 +198,13 @@ namespace Conductor.RegexTools
             txtTestText.Styles[Style.Default].Font = "Consolas";
 
 
-            if (this.txtRE.Text == "" || this.txtTestText.Text == "") return;
+            if (this.txtRE.Text == "" || this.txtTestText.Text == "")
 
+            {
+                this.lblResultSummary.Text = "Nothing to match";
+                this.lblResultSummary.BackColor = SystemColors.Control;
+                return;
+            }
 
             if (_Dirty)
             {
@@ -337,7 +342,10 @@ namespace Conductor.RegexTools
                 Line line = this.txtTestText.Lines[this.txtTestText.LineFromPosition(position)];
                 //    this.txtTestText.ScrollRange(line.Position, line.Position);
             }
+           
             this.gridCaptures.DataSource = _namedCaptures;
+            this.gridCaptures.Grid.Columns["position"].Visible = false;
+            this.gridCaptures.Grid.Columns["length"].Visible = false;
             //ResumeUpdating();
         }
 
@@ -371,6 +379,32 @@ namespace Conductor.RegexTools
         public List<Capture> CurrentCaptures
         { get { return this._namedCaptures.ToList<Capture>(); } }
 
+        public bool MatchFound
+        {
+            get
+            {
+                if (_re == null)
+                    return false;
+                return _re.MatchFound;
+            }
+        }
+
+        public Dictionary<string, Capture> CurrentCapturesAsDict
+        {
+            get
+            {
+                Dictionary<string, Capture> results = new Dictionary<string, RegexTools.Capture>();
+                foreach (Capture c in _namedCaptures)
+                {
+                    if (results.ContainsKey(c.name) && results[c.name].value != c.value)
+                        throw new ApplicationException("More than one capture named " + c.name + " - with different values.  Cannot get dictionary.");
+                    results[c.name] = c;
+                }
+
+                return results;
+            }
+
+        }
 
         private void txtTestText_TextChanged(object sender, EventArgs e)
         {
@@ -387,7 +421,7 @@ namespace Conductor.RegexTools
         {
             string selectedText = input;
             string captureName = selectedText.TrimEnd(_Space);
-            captureName = captureName.Replace("(", "").Replace(")", "").Replace(":", "").Replace("-", " ").Replace(",", " ").Replace(".", " ");
+            captureName = captureName.Replace("%", "Percent ").Replace("(", "").Replace(")", "").Replace(":", "").Replace("-", " ").Replace(",", " ").Replace(".", " ");
             string[] pieces = captureName.Split(_Space, StringSplitOptions.RemoveEmptyEntries);
             string dataElementName = "";
             foreach (var piece in pieces)
@@ -459,18 +493,6 @@ namespace Conductor.RegexTools
                     {
                         selectedText = pieces[0];
                         string dataElementName = GetDataElementName(selectedText);
-                        //.*(?:Tumor site: ?(?<TumorSite>.*?)\r)?
-                        /*
-                         CAPDP1a
-(?:Procedure, specimen laterality: ?(?<A_CAP>.*?)
-)(?:Tumor site: ?(?<C_CAP>.*?)
-)?Tumor size
-
-                        (?:.*?CT1:(?<CT1>.*?)\n)?.*?
-
-
-                         */
-
                         string regexFragment = @"(?:.*?" + selectedText.Replace("(", @"\(").Replace(")", @"\)") + ": ?";
                         regexFragment += "(?<" + dataElementName + @">.*?)\n)?.*?";
                         pattern += regexFragment;
@@ -480,14 +502,25 @@ namespace Conductor.RegexTools
                 {
                     pattern += line.Replace("(", @"\(").Replace(")", @"\)");
                     if (lineIndex != lines.Length - 1)
-                        pattern += @"\r\n.*?";
+                        pattern += @".*?\r\n.*?";
 
                 }
-
-
             }
-            this.Pattern = this.Pattern + pattern;
+            this.Pattern = pattern;
+
+            this.txtTestText.SetEmptySelection(this.txtTestText.SelectionStart);
+
         }
+
+        public void Clear()
+        {
+            this.lblResultSummary.Text = "";
+            this.txtRE.Text = "";
+            this.txtTestText.Text = "";
+            this.gridCaptures.DataSource = null;
+            _namedCaptures.Clear();
+        }
+
 
         private void button5_Click(object sender, EventArgs e)
         {
@@ -498,7 +531,7 @@ namespace Conductor.RegexTools
 
             string CurrentRE = "";
             string CurrentFragment = "";
-
+            string BadFragment = "";
             string splitAt1 = @"\r\n";
             string splitAt2 = "?(?:";
 
@@ -531,6 +564,7 @@ namespace Conductor.RegexTools
                 catch
                 {
                     success = false;
+
                 }
 
                 if (success)
@@ -539,7 +573,10 @@ namespace Conductor.RegexTools
                     LastSuccesfulRE = CurrentRE;
                 }
                 else
+                {
+                    BadFragment = CurrentFragment;
                     break;
+                }
 
             }
 
@@ -590,19 +627,27 @@ namespace Conductor.RegexTools
                         LastSuccesfulRE = CurrentRE;
                     }
                     else
+                    {
+                        BadFragment = CurrentFragment;
                         break;
+                    }
 
 
 
                 }
 
 
-                SetInfo("Last match frag:" + LastSuccesfulFragment, true);
+
                 string lastRe = LastSuccesfulRE;
-
-
+                Pattern = LastSuccesfulRE;
+                lblResultSummary.Text = "Bad frag:" + BadFragment;
             }
 
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            List<string> captureGroups = RegexHelper.GetNamedCaptureGroups(this.Pattern);
         }
     }
 

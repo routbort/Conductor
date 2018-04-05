@@ -142,6 +142,9 @@ namespace Conductor.GUI
 
         }
 
+        public int RowHeightPadding { get; set; } = 4;
+
+
         private void cmdBigger_Click(object sender, EventArgs e)
         {
             AdjustFont(2f);
@@ -155,10 +158,25 @@ namespace Conductor.GUI
         void AdjustFont(float amount)
         {
             Font currentFont = this.Grid.DefaultCellStyle.Font;
+
+        //    System.Diagnostics.Debug.WriteLine(currentFont.Height.ToString());
+
+     //       System.Diagnostics.Debug.WriteLine(this.Grid.RowTemplate.Height.ToString());
+
+
             float currentSize = currentFont.Size;
             currentSize += amount;
             this.Grid.DefaultCellStyle.Font = new System.Drawing.Font(currentFont.Name, currentSize, currentFont.Style, currentFont.Unit);
 
+
+
+
+            Grid.RowTemplate.Resizable = DataGridViewTriState.True;
+
+            this.Grid.RowTemplate.Height = this.Grid.DefaultCellStyle.Font.Height + RowHeightPadding * 2;
+
+            foreach (DataGridViewRow row in this.Grid.Rows)
+                row.Height = this.Grid.RowTemplate.Height;
 
 
         }
