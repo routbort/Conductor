@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Conductor.Devices.PerceptionRackScanner
+namespace Conductor.Devices.RackScanner
 {
     public partial class RackScanProgressControl : UserControl
     {
@@ -16,13 +16,24 @@ namespace Conductor.Devices.PerceptionRackScanner
             InitializeComponent();
         }
 
-        public void Bind(RackScanner scanner)
+        public void Bind(IRackScanner scanner)
         {
+     
 
-            scanner.RackScannerLogEvent += new RackScanner.RackScannerLogEventHandler(scanner_RackScannerLogEvent);
-
+            scanner.RackScannerLogEvent += Scanner_RackScannerLogEvent;
 
         }
+
+        private void Scanner_RackScannerLogEvent(object sender, RackScanEventLogEntry e)
+        {
+            this.lstLog.Items.Add(e.When.ToLongTimeString() + ": " + e.Message);
+            this.lstLog.SelectedIndex = lstLog.Items.Count - 1;
+            lstLog.TopIndex = lstLog.Items.Count - 1;
+            int ToGo = 100 - this.progressBar1.Value;
+            int step = ToGo / 2;
+            this.progressBar1.Value += step;
+        }
+
         public void Clear()
         {
 
@@ -31,17 +42,7 @@ namespace Conductor.Devices.PerceptionRackScanner
             this.progressBar1.Visible = false;
 
         }
-        void scanner_RackScannerLogEvent(string message)
-        {
-            this.lstLog.Items.Add(message);
-            this.lstLog.SelectedIndex = lstLog.Items.Count - 1;
-            lstLog.TopIndex = lstLog.Items.Count - 1;
-
-            int ToGo = 100 - this.progressBar1.Value;
-            int step = ToGo / 2;
-            this.progressBar1.Value += step;
-
-        }
+ 
 
         public bool ShowProgress { get { return this.progressBar1.Visible; } set { this.progressBar1.Visible = value; } }
 

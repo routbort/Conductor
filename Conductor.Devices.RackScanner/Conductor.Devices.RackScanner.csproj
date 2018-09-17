@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{711ED89A-2DA4-4BF8-9577-6C4B105B4156}</ProjectGuid>
+    <ProjectGuid>{27BE8F79-3E03-442B-A72F-8B28EB890557}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Conductor.Devices.PerceptionRackScanner</RootNamespace>
-    <AssemblyName>Conductor.Devices.PerceptionRackScanner</AssemblyName>
+    <RootNamespace>Conductor.Devices.RackScanner</RootNamespace>
+    <AssemblyName>Conductor.Devices.RackScanner</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,13 +52,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRackScanner.cs" />
+    <Compile Include="RackScanEventLogEntry.cs" />
+    <Compile Include="FluidX\FluidXRackScanner.cs" />
+    <Compile Include="Ziath\ZiathScannerProfile.cs" />
+    <Compile Include="Ziath\ZiathRackScanner.cs" />
     <Compile Include="RackScanProgressControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="RackScanProgressControl.Designer.cs">
       <DependentUpon>RackScanProgressControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="RackScanner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleRackScanControl.cs">
       <SubType>UserControl</SubType>
@@ -67,9 +72,7 @@
     </Compile>
     <Compile Include="RackScanResult.cs" />
     <Compile Include="RackScanWrapperException.cs" />
-    <Compile Include="ScannerProfile.cs" />
-    <Compile Include="TelnetConnection2.cs" />
-    <Compile Include="TelnetInterface.cs" />
+    <Compile Include="FluidX\FluidXScannerProfile.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="RackScanProgressControl.resx">
@@ -78,6 +81,12 @@
     <EmbeddedResource Include="SimpleRackScanControl.resx">
       <DependentUpon>SimpleRackScanControl.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Conductor.Components\Conductor.Components.csproj">
+      <Project>{8865a19c-2fde-49c1-a357-fd17a3d2318c}</Project>
+      <Name>Conductor.Components</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

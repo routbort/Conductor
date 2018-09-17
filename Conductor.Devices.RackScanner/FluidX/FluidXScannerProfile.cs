@@ -5,17 +5,12 @@ using System.Text;
 using System.IO;
 
 
-namespace Conductor.Devices.PerceptionRackScanner
+namespace Conductor.Devices.RackScanner
 {
-    public class ScannerProfile
+    public class FluidXScannerProfile
     {
 
-        private ScannerProfile()
-        {
-        }
-
-
-        public ScannerProfile(string ResultsDirectory = @"C:\fluidX Output")
+        public FluidXScannerProfile()
         {
 
             this.ScannerName = "Perception";
@@ -26,11 +21,10 @@ namespace Conductor.Devices.PerceptionRackScanner
             this.ExeName = "IntelliCodel.exe";
             this.ProfileName = "96 2.xtprof";
             this.InstrumentName = "Perception";
-            this.ProcessName = "IntelliCodel";
+            this.ProcessName = "Intellicodel";
             this.Port = 8001;
             this.FailedScanRetryCount = 0;
-            this.ResultsDirectory = ResultsDirectory;
-           // this.Conversion = ScannerProfile.FlipType.Flip96;
+            this.Conversion = FluidXScannerProfile.FlipType.Flip96;
         }
 
         public int FailedScanRetryCount { get; set; }
@@ -40,27 +34,11 @@ namespace Conductor.Devices.PerceptionRackScanner
         public bool ThrowExceptionOnError { get; set; }
         public List<string> ExeSearchPath { get; private set; }
         public string ExeName { get; set; }
-        public string ResultsDirectory { get;private set; }
         public string InstrumentName { get; set; }
-        public  FlipType Conversion { get; set; }
+        public string ProfileName { get; set; }
+        public FlipType Conversion { get; set; }
 
-
-        
         public enum FlipType { None, Flip96 }
-
-
-
-
-        public string ExeFolder
-        {
-            get
-            {
-                foreach (string folder in this.ExeSearchPath)
-                    if (Directory.Exists(folder))
-                        return folder;
-                return null;
-            }
-        }
 
         public string FullExePath
         {
@@ -74,6 +52,15 @@ namespace Conductor.Devices.PerceptionRackScanner
             }
         }
 
-        public string ProfileName { get; set; }
+        public string ExeFolder
+        {
+            get
+            {
+                foreach (string folder in this.ExeSearchPath)
+                    if (Directory.Exists(folder))
+                        return folder;
+                return null;
+            }
+        }
     }
 }

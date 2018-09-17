@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Conductor.Devices.PerceptionRackScanner
+namespace Conductor.Devices.RackScanner
 {
-    public class RackScanResult
+    public class RackScanResult:EventArgs
     {
 
         public RackScanResult()
@@ -32,7 +32,6 @@ namespace Conductor.Devices.PerceptionRackScanner
 
 
         }
-
 
         public int RetryCount { get; set; }
         public string InterfaceMessage { get; set; }

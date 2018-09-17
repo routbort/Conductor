@@ -30,16 +30,20 @@
         {
             Conductor.GUI.CartesianMapper cartesianMapper1 = new Conductor.GUI.CartesianMapper();
             this.cartesianGrid1 = new Conductor.GUI.CartesianGrid();
-            this.simpleRackScanControl1 = new Conductor.Devices.PerceptionRackScanner.SimpleRackScanControl();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.txtBarcode = new System.Windows.Forms.TextBox();
             this.cmdSimulateScan = new System.Windows.Forms.Button();
+            this.simpleRackScanControl1 = new Conductor.Devices.RackScanner.SimpleRackScanControl();
             this.lblMessage = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbFluidX = new System.Windows.Forms.RadioButton();
+            this.rbZiath = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // cartesianGrid1
@@ -76,15 +80,6 @@
             this.cartesianGrid1.Text = null;
             this.cartesianGrid1.ThrowExceptionsOnErrors = true;
             // 
-            // simpleRackScanControl1
-            // 
-            this.simpleRackScanControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.simpleRackScanControl1.Location = new System.Drawing.Point(0, 0);
-            this.simpleRackScanControl1.Name = "simpleRackScanControl1";
-            this.simpleRackScanControl1.Size = new System.Drawing.Size(856, 116);
-            this.simpleRackScanControl1.TabIndex = 2;
-            this.simpleRackScanControl1.Visible = false;
-            // 
             // listBox1
             // 
             this.listBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -113,8 +108,9 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.lblMessage);
             this.splitContainer1.Panel2.Controls.Add(this.simpleRackScanControl1);
+            this.splitContainer1.Panel2.Controls.Add(this.lblMessage);
+            this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
             this.splitContainer1.Size = new System.Drawing.Size(1020, 116);
             this.splitContainer1.SplitterDistance = 160;
             this.splitContainer1.TabIndex = 5;
@@ -137,16 +133,61 @@
             this.cmdSimulateScan.UseVisualStyleBackColor = true;
             this.cmdSimulateScan.Click += new System.EventHandler(this.button1_Click_2);
             // 
+            // simpleRackScanControl1
+            // 
+            this.simpleRackScanControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.simpleRackScanControl1.Location = new System.Drawing.Point(69, 0);
+            this.simpleRackScanControl1.Name = "simpleRackScanControl1";
+            this.simpleRackScanControl1.Size = new System.Drawing.Size(787, 116);
+            this.simpleRackScanControl1.TabIndex = 2;
+            this.simpleRackScanControl1.Visible = false;
+            // 
             // lblMessage
             // 
             this.lblMessage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMessage.Location = new System.Drawing.Point(0, 0);
+            this.lblMessage.Location = new System.Drawing.Point(69, 0);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(856, 116);
+            this.lblMessage.Size = new System.Drawing.Size(787, 116);
             this.lblMessage.TabIndex = 3;
             this.lblMessage.Text = "Message";
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rbFluidX);
+            this.groupBox1.Controls.Add(this.rbZiath);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(69, 116);
+            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Scanner";
+            // 
+            // rbFluidX
+            // 
+            this.rbFluidX.AutoSize = true;
+            this.rbFluidX.Location = new System.Drawing.Point(6, 70);
+            this.rbFluidX.Name = "rbFluidX";
+            this.rbFluidX.Size = new System.Drawing.Size(54, 17);
+            this.rbFluidX.TabIndex = 1;
+            this.rbFluidX.TabStop = true;
+            this.rbFluidX.Text = "FluidX";
+            this.rbFluidX.UseVisualStyleBackColor = true;
+            this.rbFluidX.CheckedChanged += new System.EventHandler(this.rbFluidX_CheckedChanged);
+            // 
+            // rbZiath
+            // 
+            this.rbZiath.AutoSize = true;
+            this.rbZiath.Location = new System.Drawing.Point(6, 31);
+            this.rbZiath.Name = "rbZiath";
+            this.rbZiath.Size = new System.Drawing.Size(49, 17);
+            this.rbZiath.TabIndex = 0;
+            this.rbZiath.TabStop = true;
+            this.rbZiath.Text = "Ziath";
+            this.rbZiath.UseVisualStyleBackColor = true;
+            this.rbZiath.CheckedChanged += new System.EventHandler(this.rbZiath_CheckedChanged);
             // 
             // Form1
             // 
@@ -163,18 +204,23 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
         private Conductor.GUI.CartesianGrid cartesianGrid1;
-        private Conductor.Devices.PerceptionRackScanner.SimpleRackScanControl simpleRackScanControl1;
+        private Conductor.Devices.RackScanner.SimpleRackScanControl simpleRackScanControl1;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Label lblMessage;
         private System.Windows.Forms.Button cmdSimulateScan;
         private System.Windows.Forms.TextBox txtBarcode;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton rbFluidX;
+        private System.Windows.Forms.RadioButton rbZiath;
     }
 }
 

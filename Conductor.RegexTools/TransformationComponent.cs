@@ -8,7 +8,7 @@ namespace Conductor.RegexTools
 
     public class TranformationComponent
     {
-        public string Pattern { get; set; }
+        public List<string> Pattern { get; set; }
         public bool IsRequiredToMatch { get; set; }
         public bool AllowMultipleMatches { get; set; }
 

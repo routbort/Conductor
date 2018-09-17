@@ -192,13 +192,12 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(158, 17);
+            this.button6.Location = new System.Drawing.Point(158, 106);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(23, 23);
             this.button6.TabIndex = 7;
             this.button6.Text = "button6";
             this.button6.UseVisualStyleBackColor = true;
-            this.button6.Visible = false;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
@@ -271,6 +270,7 @@
             this.gridCaptures.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridCaptures.Location = new System.Drawing.Point(0, 0);
             this.gridCaptures.Name = "gridCaptures";
+            this.gridCaptures.RowHeightPadding = 4;
             this.gridCaptures.SelectedRowIndex = -1;
             this.gridCaptures.Size = new System.Drawing.Size(181, 639);
             this.gridCaptures.TabIndex = 1;

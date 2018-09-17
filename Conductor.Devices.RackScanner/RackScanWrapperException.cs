@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Conductor.Devices.PerceptionRackScanner
+namespace Conductor.Devices.RackScanner
 {
     public class RackScanWrapperException : Exception
     {

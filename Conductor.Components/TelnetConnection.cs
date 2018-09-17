@@ -7,20 +7,9 @@ using System.Threading;
 using System.Net.NetworkInformation;
 
 
-// minimalistic telnet implementation
-// conceived by Tom Janssens on 2007/06/06  for codeproject
-//
-// http://www.corebvba.be
-
-// Modifications
-//
-// Date         Person      Description
-// ==========   =========   =======================================================================
-// 2013-06-06   jsagara     Implements IDisposable. Miscellaneous refactoring.
-
-namespace MinimalisticTelnet
+namespace Conductor.Components
 {
-    public class TelnetConnection2 : IDisposable
+    public class TelnetConnection : IDisposable
     {
         private TcpClient tcpSocket;
         private int TimeoutMs = 100;
@@ -36,17 +25,17 @@ namespace MinimalisticTelnet
             }
         }
 
-        public TelnetConnection2(string hostname, int port)
+        public TelnetConnection(string hostname, int port)
         {
             tcpSocket = new TcpClient(hostname, port);
         }
 
-        ~TelnetConnection2()
+        ~TelnetConnection()
         {
             Dispose(false);
         }
 
-        public static TelnetConnection2 GetLocalConnectionOnPort(int port)
+        public static TelnetConnection GetLocalConnectionOnPort(int port)
         {
 
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
@@ -60,7 +49,7 @@ namespace MinimalisticTelnet
                             continue;
                         try
                         {
-                            TelnetConnection2 tc = new TelnetConnection2(address.Address.ToString(), port);
+                            TelnetConnection tc = new TelnetConnection(address.Address.ToString(), port);
                             return tc;
                         }
 
@@ -76,7 +65,14 @@ namespace MinimalisticTelnet
 
         }
 
-        
+        public void Close()
+        {
+
+            //  this.tcpSocket.GetStream().Close();
+            //   this.tcpSocket.Close();
+
+
+        }
         public string Login(string username, string password, int loginTimeoutMs)
         {
             int oldTimeoutMs = TimeoutMs;
@@ -139,11 +135,30 @@ namespace MinimalisticTelnet
             return sb.ToString();
         }
 
+        public string ReadLine(int Timeout)
+        {
+            string current = "";
+            if (!tcpSocket.Connected)
+            {
+                return null;
+            }
+            DateTime start = DateTime.Now;
+            int startTime = Environment.TickCount;
+            while (true)
+            {
+                current += Read();
+                if (current != null)
 
+                    if (current.Contains("\r\n")) return current;
+                if (Environment.TickCount - startTime > Timeout) return null;
+            }
+
+        }
 
         public string ReadWaitForStrings(string input, List<string> options, int Timeout)
         {
-            this.WriteLine(input + System.Environment.NewLine);
+            if (input != null && input != "")
+                this.Write(input + System.Environment.NewLine);
             int startTime = Environment.TickCount; string current = "";
             while (true)
             {
@@ -159,7 +174,7 @@ namespace MinimalisticTelnet
         {
             StringBuilder sbLog = new StringBuilder();
 
-            
+
             while (tcpSocket.Available > 0)
             {
                 int input = tcpSocket.GetStream().ReadByte();
@@ -213,15 +228,14 @@ namespace MinimalisticTelnet
 
                     default:
 
-                          if ((char)input == '\n')
+                        if ((char)input == '\n')
                         {
                             if (DataReceived != null)
                                 DataReceived(sbLog.ToString());
                             sbLog.Clear();
                         }
-                    
-                          sbLog.Append((char)input);
 
+                        sbLog.Append((char)input);
                         sb.Append((char)input);
                         break;
                 }
@@ -236,16 +250,17 @@ namespace MinimalisticTelnet
 
         protected virtual void Dispose(bool disposing)
         {
+
             if (disposing)
             {
                 if (tcpSocket != null)
                 {
+
                     ((IDisposable)tcpSocket).Dispose();
                     tcpSocket = null;
                 }
             }
         }
-
 
         #region Private Enums
 

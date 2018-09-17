@@ -60,6 +60,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -119,9 +120,9 @@
       <Project>{9e8f1d50-74ea-4c60-bd5c-ab2c5b53bc66}</Project>
       <Name>Conductor.Devices.BarcodeScanner</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Conductor.Devices.PerceptionRackScanner\Conductor.Devices.PerceptionRackScanner.csproj">
-      <Project>{711ed89a-2da4-4bf8-9577-6c4b105b4156}</Project>
-      <Name>Conductor.Devices.PerceptionRackScanner</Name>
+    <ProjectReference Include="..\Conductor.Devices.RackScanner\Conductor.Devices.RackScanner.csproj">
+      <Project>{27be8f79-3e03-442b-a72f-8b28eb890557}</Project>
+      <Name>Conductor.Devices.RackScanner</Name>
     </ProjectReference>
     <ProjectReference Include="..\Conductor.Devices.XTL96\Conductor.Devices.XTL96.csproj">
       <Project>{97782d36-302e-4d79-ab35-bf6c030a2fbd}</Project>

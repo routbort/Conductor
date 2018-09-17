@@ -8,53 +8,92 @@ using System.IO;
 using System.ComponentModel;
 using System.Threading;
 
-namespace Conductor.Devices.PerceptionRackScanner
+namespace Conductor.Devices.RackScanner
 {
-    public class RackScanner
+    public class FluidXRackScanner : IRackScanner
     {
-        public delegate void RackScannedEventHandler(RackScanResult data);
-        public event RackScannedEventHandler RackScanned;
 
-        public delegate void RackScannerLogEventHandler(string message);
-        public event RackScannerLogEventHandler RackScannerLogEvent;
+        #region Static
+
+        public static Dictionary<string, string> FLUIDX_DEVICES =
+             new Dictionary<string, string>() { { "Perception", "VID_1409&PID_1005" } };
+
+        public static bool IsFluidXScannerAttached()
+        {
+
+            foreach (var deviceName in FLUIDX_DEVICES.Keys)
+                if (Conductor.Components.USBHelper.IsSpecificDeviceAvailable(FLUIDX_DEVICES[deviceName]))
+                    return true;
+            return false;
+        }
+
+        #endregion
+
+        public event EventHandler<RackScanResult> RackScanned;
+        public event EventHandler<RackScanEventLogEntry> RackScannerLogEvent;
 
         RackScanResult _result = null;
         Dictionary<string, string> _Flip96;
-        MinimalisticTelnet.TelnetConnection2 _tc = null;
-
-        public class RackScannerInitializationResult
-        {
-            public enum ResultType { OK, Failed };
-            public ResultType InitializationResult { get; set; }
-            public string ErrorMessage { get; set; }
-        }
+        Conductor.Components.TelnetConnection _tc = null;
 
         public string ErrorMessage { get; private set; }
 
-         RackScanner() { }
+        public FluidXRackScanner()
+        {
+            this.Profile = new FluidXScannerProfile();
+            if (this.ResultsDirectory == null)
+                this.ResultsDirectory = @"C:\fluidX Output";
+        }
 
-         void LogEvent(string message)
+        void LogEvent(string message)
         {
             if (this.RackScannerLogEvent != null)
-                RaiseEventOnUIThread(this.RackScannerLogEvent, new object[] { message });
+                RaiseEventOnUIThread(this.RackScannerLogEvent, new object[] { this, new RackScanEventLogEntry(message) });
         }
 
-        public RackScanner(ScannerProfile Profile)
+        string _ResultsDirectory = null;
+        FileSystemWatcher _fsw = null;
+
+        public string ResultsDirectory
         {
-            this.Profile = Profile;
-            if (!Directory.Exists(this.Profile.ResultsDirectory))
+            get
+
+            { return _ResultsDirectory; }
+            set
             {
-                GenerateError("Invalid profile results directory: " + this.Profile.ResultsDirectory);
-                return;
+                if (value == _ResultsDirectory)
+                    return;
+
+                if (_ResultsDirectory != null && _fsw != null)
+                {
+                    _fsw.EnableRaisingEvents = false;
+                    _fsw.Created -= fsw_Created;
+                    _fsw = null;
+                }
+
+                _ResultsDirectory = value;
+
+                if (value != null && value != "")
+                {
+                    if (!Directory.Exists(_ResultsDirectory))
+                    {
+                        GenerateError("Invalid profile results directory: " + ResultsDirectory);
+                        _ResultsDirectory = null;
+                        return;
+                    }
+
+                    _fsw = new FileSystemWatcher(_ResultsDirectory);
+                    _fsw.Created += new FileSystemEventHandler(fsw_Created);
+                    _fsw.EnableRaisingEvents = true;
+
+                }
+
+
             }
-            FileSystemWatcher fsw = new FileSystemWatcher(this.Profile.ResultsDirectory);
-            fsw.Created += new FileSystemEventHandler(fsw_Created);
-            fsw.EnableRaisingEvents = true;
+
         }
 
-
-
-        string Convert(ScannerProfile.FlipType flipType, string address)
+        string Convert(FluidXScannerProfile.FlipType flipType, string address)
         {
 
             if (_Flip96 == null)
@@ -84,7 +123,7 @@ namespace Conductor.Devices.PerceptionRackScanner
             }
 
 
-            if (flipType != ScannerProfile.FlipType.Flip96) throw new ApplicationException("Not supported");
+            if (flipType != FluidXScannerProfile.FlipType.Flip96) throw new ApplicationException("Not supported");
 
             string convertedValue = _Flip96[address.Substring(0, 1)] + _Flip96[address.Substring(1)];
             return convertedValue;
@@ -94,7 +133,6 @@ namespace Conductor.Devices.PerceptionRackScanner
         }
 
         bool _ScanInProgress = false;
-
 
         void fsw_Created(object sender, FileSystemEventArgs e)
         {
@@ -107,7 +145,6 @@ namespace Conductor.Devices.PerceptionRackScanner
 
             LogEvent("File found in output directory: " + e.Name);
 
-   
             _ScanInProgress = false;
 
             RackScanResult result = new RackScanResult();
@@ -147,7 +184,7 @@ namespace Conductor.Devices.PerceptionRackScanner
                 string address = items[0].Trim();
                 string element_barcode = items[1].Trim();
 
-                if (this.Profile.Conversion != ScannerProfile.FlipType.None)
+                if (this.Profile.Conversion != FluidXScannerProfile.FlipType.None)
                     address = Convert(this.Profile.Conversion, address);
 
 
@@ -160,25 +197,13 @@ namespace Conductor.Devices.PerceptionRackScanner
                     address = row_address + col_address;
                 }
 
-
-                //    string rack_barcode = items[3].Trim();
-                ////    if (result.RackBarcode == null)
-                //       result.RackBarcode = rack_barcode;
-                ///   if (result.RackBarcode != rack_barcode)
-                //  {
-                //      result.HasError = true;
-                //    result.ErrorDetail = "File failed validity check, rack barcode field was not invariant";
-                //     RaiseRackScannedEvent(result);
-                //     return;
-                //    }
-
                 if (element_barcode != "NO TUBE" && element_barcode != "NO READ")
                 {
                     RackScanResult.RackScanResultCell cell = new RackScanResult.RackScanResultCell();
                     cell.Address = address;
                     cell.Barcode = element_barcode;
                     result.Cells.Add(cell);
-                    result.BarcodeToAddressMap[element_barcode] = address ;
+                    result.BarcodeToAddressMap[element_barcode] = address;
                 }
 
                 if (element_barcode == "NO READ")
@@ -189,11 +214,7 @@ namespace Conductor.Devices.PerceptionRackScanner
 
             }
 
-            //    if (result.RackBarcode == "NO BARCODE")
-            //   {
-            //      result.HasError = true;
-            //       result.ErrorDetail = "No rack-level barcode could be scanned.  Ensure proper lighting and rack orientation.";
-            //   }
+
 
             _result = result;
 
@@ -201,7 +222,7 @@ namespace Conductor.Devices.PerceptionRackScanner
 
         }
 
-         void RaiseEventOnUIThread(Delegate theEvent, object[] args)
+        void RaiseEventOnUIThread(Delegate theEvent, object[] args)
         {
             foreach (Delegate d in theEvent.GetInvocationList())
             {
@@ -217,31 +238,31 @@ namespace Conductor.Devices.PerceptionRackScanner
             }
         }
 
-         void RaiseRackScannedEvent(RackScanResult result)
+        void RaiseRackScannedEvent(RackScanResult result)
         {
             if (this.RackScanned != null)
                 //this.RackScan(result);
-                RaiseEventOnUIThread(this.RackScanned, new object[] { result });
+                RaiseEventOnUIThread(this.RackScanned, new object[] { this, result });
         }
 
-        public ScannerProfile Profile { get; private set; }
+        public FluidXScannerProfile Profile { get; private set; }
 
         public bool IsProcessRunning()
         {
             return (System.Diagnostics.Process.GetProcessesByName(Profile.ProcessName).Length != 0);
         }
 
-         bool TryConnect(bool ForceNew = false)
+        bool TryConnect(bool ForceNew = false)
         {
 
             if (_tc == null || !_tc.IsConnected || ForceNew)
             {
                 if (_tc != null)
                     _tc.DataReceived -= _tc_DataReceived;
-             //   MessageBox.Show("PORT: " + this.Profile.Port.ToString());
-                _tc = MinimalisticTelnet.TelnetConnection2.GetLocalConnectionOnPort(this.Profile.Port);
-             if (_tc!=null)
-                    _tc.DataReceived += new MinimalisticTelnet.TelnetConnection2.DataReceivedEventHandler(_tc_DataReceived);
+                //   MessageBox.Show("PORT: " + this.Profile.Port.ToString());
+                _tc = Conductor.Components.TelnetConnection.GetLocalConnectionOnPort(this.Profile.Port);
+                if (_tc != null)
+                    _tc.DataReceived += new Conductor.Components.TelnetConnection.DataReceivedEventHandler(_tc_DataReceived);
                 LogEvent("New telnet connection to port " + this.Profile.Port + ((_tc != null) ? " succeeded" : " failed"));
             }
 
@@ -252,22 +273,6 @@ namespace Conductor.Devices.PerceptionRackScanner
         void _tc_DataReceived(string data)
         {
             SendResponseToLog(data);
-        }
-
-        public void SendWinsockTextDirect(string CommandText)
-        {
-            if (TryConnect())
-                _tc.WriteLine(CommandText + System.Environment.NewLine);
-            else
-                GenerateError("No active connection");
-
-        }
-
-        public string GetWinsockText()
-        {
-            if (TryConnect())
-                return _tc.Read();
-            return null;
         }
 
         public RackScanResult Scan()
@@ -296,25 +301,19 @@ namespace Conductor.Devices.PerceptionRackScanner
             result = ScanInternal();
 
 
-           ///
-           /// 
-           /// for (int i = 0; i <= this.Profile.FailedScanRetryCount; i++)
-          //  {
-          //      LogEvent("Initiating scan attempt " + (i + 1).ToString());
-         //       result = ScanInternal();
-          //      result.RetryCount = i;
-          //      if (!result.HasError) return result;
-           // }
-        //
+            ///
+            /// 
+            /// for (int i = 0; i <= this.Profile.FailedScanRetryCount; i++)
+            //  {
+            //      LogEvent("Initiating scan attempt " + (i + 1).ToString());
+            //       result = ScanInternal();
+            //      result.RetryCount = i;
+            //      if (!result.HasError) return result;
+            // }
+            //
 
-            if (result.HasError)
-                RaiseRackScannedEvent(result);
-
-
+            RaiseRackScannedEvent(result);
             return result;
-
-            
-
 
         }
 
@@ -346,7 +345,6 @@ namespace Conductor.Devices.PerceptionRackScanner
 
         }
 
-
         bool LoadProfileInternal()
         {
             List<string> options = new List<string>();
@@ -366,33 +364,18 @@ namespace Conductor.Devices.PerceptionRackScanner
 
         }
 
-         RackScanResult ScanInternal()
+        RackScanResult ScanInternal()
         {
 
-            RackScanResult result = new RackScanResult();
-
-            //if (!LoadProfileInternal())
-            //{
-
-            //    LogEvent("Profile load failure");
-            //    GenerateError("Profile load failure");
-            //    return result;
-            //}
-
+            RackScanResult result = new RackScanResult();        
             _result = null;
             List<string> options = new List<string>();
             options.Add("success");
             options.Add("fail");
-
             Stopwatch sw = new Stopwatch();
             sw.Start();
-
             string response = _tc.ReadWaitForStrings("Intellicode.Instrument.Profile.scan", options, 60000);
-
-            //    SendResponseToLog(response);
-
-            result.InterfaceMessage = response;
-
+                result.InterfaceMessage = response;
             if (response == null) //timeout
             {
                 LogEvent("Time out awaiting scanner response");
@@ -418,12 +401,8 @@ namespace Conductor.Devices.PerceptionRackScanner
             }
 
             LogEvent("Success detected in scan result message");
-
-
             while (_result == null && sw.Elapsed.Seconds < 20)
-            {
                 System.Threading.Thread.Sleep(300);
-            }
 
             if (_result == null)
             {
@@ -433,10 +412,8 @@ namespace Conductor.Devices.PerceptionRackScanner
                 _ScanInProgress = false;
                 return result;
             }
-
             _ScanInProgress = false;
             return _result;
-
         }
 
         public string SendAndGetResponse(string input, List<string> options)
@@ -446,12 +423,13 @@ namespace Conductor.Devices.PerceptionRackScanner
             return null;
         }
 
-         string XRS_Startup
+        string XRS_Startup
         {
             get { return "sys.Remote(winsock)"; }
         }
 
         string _XRS_File = null;
+
         public string XRS_File
         {
             get
@@ -465,7 +443,6 @@ namespace Conductor.Devices.PerceptionRackScanner
             }
         }
 
-
         public bool PadColumnAddress { get; set; } = true;
 
         public bool InitializeScanner()
@@ -478,11 +455,6 @@ namespace Conductor.Devices.PerceptionRackScanner
                 while (IsProcessRunning()) { };
                 System.Threading.Thread.Sleep(3000);
             }
-
-            //      string XRS_file = Path.Combine(this.Profile.ExeFolder, "startup.xrs");
-
-            ///    if (!File.Exists(XRS_file))
-            //     File.WriteAllText(XRS_file, XRS_Startup);
 
             Process proc = new Process();
             proc.StartInfo.FileName = this.Profile.FullExePath;
@@ -500,8 +472,6 @@ namespace Conductor.Devices.PerceptionRackScanner
                 tryCount++;
             }
 
-
-
             if (!TryConnect())
             {
                 LogEvent("Could not connect to listener process: InitializeScanner");
@@ -518,7 +488,6 @@ namespace Conductor.Devices.PerceptionRackScanner
             try
             {
                 response = _tc.ReadWaitForStrings("Intellicode.Instrument.use(" + this.Profile.InstrumentName + ")", options, 30000);
-                //  SendResponseToLog(response);
             }
             catch (Exception)
             {
@@ -531,9 +500,8 @@ namespace Conductor.Devices.PerceptionRackScanner
                         return false;
                     }
                     response = _tc.ReadWaitForStrings("Intellicode.Instrument.use(" + this.Profile.InstrumentName + ")", options, 30000);
-
                 }
-                catch (Exception ex2) 
+                catch (Exception ex2)
                 {
                     LogEvent("Unexpected  exception: " + ex2.Message);
                     GenerateError(ex2.Message);
@@ -555,10 +523,8 @@ namespace Conductor.Devices.PerceptionRackScanner
                 return false;
             }
 
-            //     this.CurrentState = State.InstrumentLoaded;
             LogEvent("Successfully connected to instrument: " + this.Profile.InstrumentName);
             options.Clear();
-
             options.Add("was loaded");
             options.Add("failed to load");
             response = _tc.ReadWaitForStrings("Intellicode.Instrument.Profile.load(" + this.Profile.ProfileName + ")", options, 5000);

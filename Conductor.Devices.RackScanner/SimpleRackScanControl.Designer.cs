@@ -1,4 +1,4 @@
-﻿namespace Conductor.Devices.PerceptionRackScanner
+﻿namespace Conductor.Devices.RackScanner
 {
     partial class SimpleRackScanControl
     {
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.rackScanLogViewer1 = new Conductor.Devices.PerceptionRackScanner.RackScanProgressControl();
+            this.rackScanLogViewer1 = new Conductor.Devices.RackScanner.RackScanProgressControl();
             this.SuspendLayout();
             // 
             // rackScanLogViewer1

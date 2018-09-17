@@ -1,4 +1,4 @@
-﻿namespace Conductor.Devices.PerceptionRackScanner
+﻿namespace Conductor.Devices.RackScanner
 {
     partial class RackScanProgressControl
     {

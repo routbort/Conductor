@@ -1,10 +1,11 @@
 ﻿using Conductor.Devices.BarcodeScanner;
-using Conductor.Devices.PerceptionRackScanner;
+using Conductor.Devices.RackScanner;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Conductor.GUI.Examples;
 using System.Windows.Forms;
+using System.Management;
 
 namespace QuickExample
 {
@@ -18,54 +19,26 @@ namespace QuickExample
         public Form1()
         {
             InitializeComponent();
-            this.simpleRackScanControl1.RackScanner.Profile.ProfileName = "96 2.xtprof";
-            this.simpleRackScanControl1.RackScanner.RackScanned += simpleRackScanControl1_RackScanned;
+            this.simpleRackScanControl1.RackScanned += SimpleRackScanControl1_RackScanned;
             _BCW = new BarCodeWatcher();
             _BCW.CodeRead += _BCW_CodeRead;
             ShowMessage("Select store or check mode");
         }
 
-        void HandleBarcodeScan(Code barcode)
-        {
-            if (this.listBox1.SelectedIndex == -1)
-            {
-                ShowMessage("Select store or check mode", true);
-                SoundHelper.PlayWaveResource("MinorError.wav");
-                return;
-            }
-
-            this.cartesianGrid1.DataSource = null;
-            this.Refresh();
-
-            if (listBox1.SelectedIndex == 1 && !_tubes.ContainsKey(barcode.TextData))
-            {
-                ShowMessage ("Rack " + _CurrentRackCode + " has not yet been inventoried", true);
-                SoundHelper.PlayWaveResource("MinorError.wav");
-                return;
-            }
-
-            _CurrentRackCode = barcode.TextData;
-            this.lblMessage.Visible = false;
-            this.simpleRackScanControl1.Visible = true;
-            this.simpleRackScanControl1.Scan();
-        }
-
-        private void _BCW_CodeRead(Code barcode)
-        {
-            Invoke((MethodInvoker)delegate
-            {
-                HandleBarcodeScan(barcode);
-            });
-        }
-
-        void HandleRackScan(RackScanResult data)
+        private void SimpleRackScanControl1_RackScanned(object sender, RackScanResult e)
         {
             this.simpleRackScanControl1.Visible = false;
-
+            if (e.HasError)
+            {
+                this.cartesianGrid1.Visible = false;
+                this.ShowMessage(e.ErrorDetail, true);
+                return;
+            }
+            this.cartesianGrid1.Visible = true;
             Dictionary<string, string> currentTubes = new Dictionary<string, string>();
 
             List<Sample> tubes = new List<Sample>();
-            foreach (var cell in data.Cells)
+            foreach (var cell in e.Cells)
             {
                 Sample tube = new Sample();
                 tube.CurrentCartesianAddress = cell.Address;
@@ -117,14 +90,55 @@ namespace QuickExample
                 }
 
             }
-
         }
+
+        void HandleBarcodeScan(Code barcode)
+        {
+            if (this.listBox1.SelectedIndex == -1)
+            {
+                ShowMessage("Select store or check mode", true);
+                SoundHelper.PlayWaveResource("MinorError.wav");
+                return;
+            }
+
+            if (this.simpleRackScanControl1.RackScanner == null)
+
+            {
+                ShowMessage("Select a scanner type", true);
+                SoundHelper.PlayWaveResource("MinorError.wav");
+                return;
+            }
+
+            this.cartesianGrid1.DataSource = null;
+            this.Refresh();
+
+            if (listBox1.SelectedIndex == 1 && !_tubes.ContainsKey(barcode.TextData))
+            {
+                ShowMessage("Rack " + _CurrentRackCode + " has not yet been inventoried", true);
+                SoundHelper.PlayWaveResource("MinorError.wav");
+                return;
+            }
+
+            _CurrentRackCode = barcode.TextData;
+            this.lblMessage.Visible = false;
+            this.simpleRackScanControl1.Visible = true;
+            this.simpleRackScanControl1.Scan();
+        }
+
+        private void _BCW_CodeRead(Code barcode)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                HandleBarcodeScan(barcode);
+            });
+        }
+
 
         private void simpleRackScanControl1_RackScanned(RackScanResult data)
         {
             Invoke((MethodInvoker)delegate
             {
-                HandleRackScan(data);
+                SimpleRackScanControl1_RackScanned(this, data);
             });
 
         }
@@ -140,7 +154,7 @@ namespace QuickExample
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex == 0)
-            {           
+            {
                 //testing that DLL change is ignored
                 ShowMessage("Store into inventory " + System.Environment.NewLine + "Place rack on scanner and scan the rack bar code");
             }
@@ -155,7 +169,7 @@ namespace QuickExample
 
         private void button1_Click_2(object sender, EventArgs e)
         {
-            Code bc = new Code(this.txtBarcode.Text, Symbology.Code128);     
+            Code bc = new Code(this.txtBarcode.Text, Symbology.Code128);
             this.HandleBarcodeScan(bc);
         }
 
@@ -163,5 +177,34 @@ namespace QuickExample
         {
             Application.Exit();
         }
+
+        Conductor.Devices.RackScanner.ZiathRackScanner _rs = null;
+
+
+
+
+
+        private void rbZiath_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbZiath.Checked)
+            {
+                if (!ZiathRackScanner.IsZiathScannerAttached())
+                    MessageBox.Show("No Ziath scanner detected - scanning may fail"); 
+                ZiathRackScanner zr = new ZiathRackScanner();
+                this.simpleRackScanControl1.Bind(zr);
+            }
+        }
+
+        private void rbFluidX_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbFluidX.Checked)
+            {
+                if (!FluidXRackScanner.IsFluidXScannerAttached())
+                    MessageBox.Show("No FluidX scanner detected - scanning may fail");
+                FluidXRackScanner fr = new FluidXRackScanner();
+                this.simpleRackScanControl1.Bind(fr);
+            }
+        }
+
     }
 }

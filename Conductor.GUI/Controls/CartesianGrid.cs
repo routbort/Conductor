@@ -164,7 +164,6 @@ namespace Conductor.GUI
             this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             this.SetStyle(ControlStyles.UserPaint, true);
             this.SetStyle(ControlStyles.ResizeRedraw, true);
-            this.ItemFillOrder = Mapping.FillOrder.TopBottomLeftRight;
             LayoutGrid(true);
             this.MouseMove += CartesianGrid_MouseMove;
             this.MouseDown += CartesianGrid_MouseDown;
@@ -571,8 +570,6 @@ namespace Conductor.GUI
                 results.Add(this.Mapper.GetAddressFromOrdinal(i));
             return results;
         }
-
-
 
         void LayoutGrid(bool FillOrderChanged)
         {
@@ -1183,7 +1180,7 @@ namespace Conductor.GUI
         public Mapping.FillOrder ItemFillOrder
         {
 
-            get { return _Order; }
+            get { return _Order; }  
             set
             {
                 if (_Mapper != null)

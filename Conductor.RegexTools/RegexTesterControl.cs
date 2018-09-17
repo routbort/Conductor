@@ -186,6 +186,13 @@ namespace Conductor.RegexTools
         BindingList<Capture> _namedCaptures = new BindingList<Capture>();
         MatchCollection _matches = null;
 
+        private string Clean(string input)
+        {
+
+            return input.Replace("\r", "").Replace("\n", "");
+        }
+
+
         public void MatchText()
         {
             SetPending();
@@ -210,7 +217,9 @@ namespace Conductor.RegexTools
             {
                 try
                 {
-                    _re = new RegexTools.SafeRegex(Pattern, 500, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+                   // _re = new RegexTools.SafeRegex(Pattern, 500, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+                    _re = new RegexTools.SafeRegex(Clean(Pattern), 500, RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
+
                     _Dirty = false;
                 }
                 catch (Exception ex)
@@ -268,15 +277,17 @@ namespace Conductor.RegexTools
 
                 foreach (Target target in targets)
                 {
-                    Capture capture = new Capture(target.name);
-
+           
                     Group g = match.Groups[target.name];
 
-                    capture.value = g.Value;
-                    capture.position = g.Index;
-                    capture.length = g.Length;
-
-                    _namedCaptures.Add(capture);
+                    if (g.Index != 0)
+                    {
+                        Capture capture = new Capture(target.name);
+                        capture.value = g.Value;
+                        capture.position = g.Index;
+                        capture.length = g.Length;
+                        _namedCaptures.Add(capture);
+                    }
                     //  currentCaptures.Add(capture);
 
                 }
@@ -647,7 +658,50 @@ namespace Conductor.RegexTools
 
         private void button6_Click(object sender, EventArgs e)
         {
-            List<string> captureGroups = RegexHelper.GetNamedCaptureGroups(this.Pattern);
+            //List<string> captureGroups = RegexHelper.GetNamedCaptureGroups(this.Pattern);
+            string selectedText = this.txtTestText.SelectedText;
+            string pattern = "";
+            string[] lines = selectedText.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            string start = lines[0].Replace(" ", "").Replace("\t", "");
+            string end = lines[lines.Length-1].Replace(" ", "").Replace("\t", "");
+
+
+            for (int lineIndex = 1; lineIndex < lines.Length-1; lineIndex++)
+
+            {
+                var line = lines[lineIndex];
+                if (line.Contains(":"))
+                {
+                    string[] pieces = line.Split(new string[] { ":" }, StringSplitOptions.None);
+                    if (pieces.Length == 2)
+                    {
+                        selectedText = pieces[0];
+                        string dataElementName = GetDataElementName(selectedText);
+                        selectedText = selectedText.Replace(" ", "\\ ").Replace("\t", "\\t").Replace("(", "\\(").Replace(")", "\\)");
+                        string regexFragment = @"(?<=" + start + @".*\n)" + selectedText + @":\s?(?<" + dataElementName + @">.*?)\r\n(?=.*?" + end + ")";
+                        pattern += ((pattern!="") ? "\r\n|\r\n": "(?x)\r\n"  ) + regexFragment;
+
+
+                        /* (? x)
+(?<= start.*\n)at1: (?< AT1 >.*?)\r\n(?=.*? end)
+    |
+(?<= start.*\n)at2: (?< AT2 >.*?)\r\n(?=.*? end)
+*/
+                    }
+    }
+                else
+                {
+                  
+                    //in the new model we'll ignore these
+
+                }
+            }
+            this.Pattern = pattern;
+
+            this.txtTestText.SetEmptySelection(this.txtTestText.SelectionStart);
+
+
         }
     }
 
