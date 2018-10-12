@@ -35,6 +35,7 @@ namespace QuickExample
                 return;
             }
             this.cartesianGrid1.Visible = true;
+            this.cartesianGrid1.Text = (e.RackBarcode != null && e.RackBarcode !="")? this.txtBarcode.Text + " (" + e.RackBarcode + ")": this.txtBarcode.Text;
             Dictionary<string, string> currentTubes = new Dictionary<string, string>();
 
             List<Sample> tubes = new List<Sample>();
@@ -191,6 +192,7 @@ namespace QuickExample
                 if (!ZiathRackScanner.IsZiathScannerAttached())
                     MessageBox.Show("No Ziath scanner detected - scanning may fail"); 
                 ZiathRackScanner zr = new ZiathRackScanner();
+                zr.Profile.ProfileName = "2";
                 this.simpleRackScanControl1.Bind(zr);
             }
         }

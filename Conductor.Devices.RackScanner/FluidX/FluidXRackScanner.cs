@@ -245,7 +245,7 @@ namespace Conductor.Devices.RackScanner
                 RaiseEventOnUIThread(this.RackScanned, new object[] { this, result });
         }
 
-        public FluidXScannerProfile Profile { get; private set; }
+        public FluidXScannerProfile Profile { get;  set; }
 
         public bool IsProcessRunning()
         {

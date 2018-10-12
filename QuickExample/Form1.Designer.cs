@@ -39,6 +39,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.rbFluidX = new System.Windows.Forms.RadioButton();
             this.rbZiath = new System.Windows.Forms.RadioButton();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -155,6 +156,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.rbFluidX);
             this.groupBox1.Controls.Add(this.rbZiath);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
@@ -189,6 +191,15 @@
             this.rbZiath.UseVisualStyleBackColor = true;
             this.rbZiath.CheckedChanged += new System.EventHandler(this.rbZiath_CheckedChanged);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(7, 92);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(53, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -221,6 +232,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton rbFluidX;
         private System.Windows.Forms.RadioButton rbZiath;
+        private System.Windows.Forms.Button button1;
     }
 }
 

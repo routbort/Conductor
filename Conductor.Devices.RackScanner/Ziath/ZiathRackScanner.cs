@@ -189,7 +189,7 @@ namespace Conductor.Devices.RackScanner
                     string[] items = line.Split(div);
                     if (items != null && items.Length == 7)
                     {
-                        string rack_barcode = items[2];
+                        string rack_barcode = (items[6] != "NOREAD") ? items[6] : "";
                         string row = items[3];
                         int colInt = Convert.ToInt32(items[4]);
 
