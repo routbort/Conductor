@@ -192,7 +192,7 @@ namespace QuickExample
                 if (!ZiathRackScanner.IsZiathScannerAttached())
                     MessageBox.Show("No Ziath scanner detected - scanning may fail"); 
                 ZiathRackScanner zr = new ZiathRackScanner();
-                zr.Profile.ProfileName = "2";
+                zr.Profile.ProfileName = "24";
                 this.simpleRackScanControl1.Bind(zr);
             }
         }

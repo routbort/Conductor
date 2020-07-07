@@ -37,9 +37,9 @@
             this.simpleRackScanControl1 = new Conductor.Devices.RackScanner.SimpleRackScanControl();
             this.lblMessage = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.rbFluidX = new System.Windows.Forms.RadioButton();
             this.rbZiath = new System.Windows.Forms.RadioButton();
-            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -60,7 +60,7 @@
             this.cartesianGrid1.CutCellsColor = System.Drawing.Color.BurlyWood;
             this.cartesianGrid1.DataBoundItemTypeRestriction = null;
             this.cartesianGrid1.DataSource = null;
-            this.cartesianGrid1.Dimensions = new System.Drawing.Size(12, 8);
+            this.cartesianGrid1.Dimensions = new System.Drawing.Size(6, 4);
             this.cartesianGrid1.ErrorCaptionHeight = 35;
             this.cartesianGrid1.FillMode = Conductor.GUI.Mapping.AutoFillMode.Preserve;
             this.cartesianGrid1.ForeColor = System.Drawing.Color.Black;
@@ -68,9 +68,9 @@
             this.cartesianGrid1.HideErrors = true;
             this.cartesianGrid1.ItemFillOrder = Conductor.GUI.Mapping.FillOrder.TopBottomLeftRight;
             this.cartesianGrid1.Location = new System.Drawing.Point(4, 122);
-            cartesianMapper1.ColCount = 12;
+            cartesianMapper1.ColCount = 6;
             cartesianMapper1.Order = Conductor.GUI.Mapping.FillOrder.TopBottomLeftRight;
-            cartesianMapper1.RowCount = 8;
+            cartesianMapper1.RowCount = 4;
             this.cartesianGrid1.Mapper = cartesianMapper1;
             this.cartesianGrid1.Name = "cartesianGrid1";
             this.cartesianGrid1.SelectedCellBorderColor = System.Drawing.Color.BlueViolet;
@@ -167,6 +167,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Scanner";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(7, 92);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(53, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // rbFluidX
             // 
             this.rbFluidX.AutoSize = true;
@@ -190,15 +199,6 @@
             this.rbZiath.Text = "Ziath";
             this.rbZiath.UseVisualStyleBackColor = true;
             this.rbZiath.CheckedChanged += new System.EventHandler(this.rbZiath_CheckedChanged);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(7, 92);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(53, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 

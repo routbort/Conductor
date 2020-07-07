@@ -80,5 +80,9 @@ namespace Conductor.GUI.Examples
 
         public bool? Confirmed { get; set; }
 
+        public string tube_side_barcode { get; set; }
+
+        public string tube_bottom_barcode { get; set; }
+
     }
 }

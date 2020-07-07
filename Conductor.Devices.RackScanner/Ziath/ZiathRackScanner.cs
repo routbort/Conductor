@@ -301,6 +301,12 @@ namespace Conductor.Devices.RackScanner
 
             LogEvent("Scan command acknowledged.  Acquiring ...");
             data = conn.ReadWaitForStrings("", new List<string>() { "OK", "ERR" }, 5000);
+            if (data == null)
+            {
+                LogEvent("No data. Scan must be repeated ...");
+                data = "";
+            }
+                
             if (data.Contains("ERR"))
             {
                 data = data.Replace("OK\r\n", "");
