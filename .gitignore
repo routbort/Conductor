@@ -111,4 +111,5 @@ Backup*/
 UpgradeLog*.XML
 /.vs/config/applicationhost.config
 /.vs/Conductor/v14/.suo
+/.vs/Conductor/v15/Server/sqlite3/*
 *.suo

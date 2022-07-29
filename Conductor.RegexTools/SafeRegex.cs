@@ -108,15 +108,18 @@ namespace Conductor.RegexTools
             Stopwatch sw = new Stopwatch();
             sw.Start();
             var workThread = new Thread(new ParameterizedThreadStart(SafeRegexWorkerThread));
+        
             workThread.Start(input);
             if (!workThread.Join(Timeout))
             {
+
                 workThread.Abort();
+
                 throw new RegexPerformanceException("Timeout of " + Timeout.ToString() + " ms exceeded - probable catastrophic backtracking");
             }
             sw.Stop();
             _LastMatchExecutionTime = sw.ElapsedMilliseconds;
-            MatchFound = (_matches.Count!=0);
+            MatchFound = (_matches.Count != 0);
             return _matches;
         }
 
@@ -127,9 +130,11 @@ namespace Conductor.RegexTools
 
         private void SafeRegexWorkerThread(object argument)
         {
+
             MatchCollection matches = _Regex.Matches(argument.ToString());
             int matchCount = matches.Count;
             _matches = matches;
+
         }
 
         MatchCollection _matches = null;

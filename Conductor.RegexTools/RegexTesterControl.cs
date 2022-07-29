@@ -18,6 +18,9 @@ namespace Conductor.RegexTools
 
     public partial class RegexTesterControl : UserControl
     {
+
+        public bool AllowRepetitiveNamedCaptures { get; set; } = false;
+
         public RegexTesterControl()
         {
             InitializeComponent();
@@ -217,7 +220,7 @@ namespace Conductor.RegexTools
             {
                 try
                 {
-                   // _re = new RegexTools.SafeRegex(Pattern, 500, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
+                    // _re = new RegexTools.SafeRegex(Pattern, 500, RegexOptions.Singleline | RegexOptions.ExplicitCapture);
                     _re = new RegexTools.SafeRegex(Clean(Pattern), 500, RegexOptions.Singleline | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
 
                     _Dirty = false;
@@ -277,7 +280,7 @@ namespace Conductor.RegexTools
 
                 foreach (Target target in targets)
                 {
-           
+
                     Group g = match.Groups[target.name];
 
                     if (g.Index != 0)
@@ -353,7 +356,7 @@ namespace Conductor.RegexTools
                 Line line = this.txtTestText.Lines[this.txtTestText.LineFromPosition(position)];
                 //    this.txtTestText.ScrollRange(line.Position, line.Position);
             }
-           
+
             this.gridCaptures.DataSource = _namedCaptures;
             this.gridCaptures.Grid.Columns["position"].Visible = false;
             this.gridCaptures.Grid.Columns["length"].Visible = false;
@@ -407,9 +410,10 @@ namespace Conductor.RegexTools
                 Dictionary<string, Capture> results = new Dictionary<string, RegexTools.Capture>();
                 foreach (Capture c in _namedCaptures)
                 {
-                    if (results.ContainsKey(c.name) && results[c.name].value != c.value)
+                    if (results.ContainsKey(c.name) && results[c.name].value != c.value && !AllowRepetitiveNamedCaptures)
                         throw new ApplicationException("More than one capture named " + c.name + " - with different values.  Cannot get dictionary.");
-                    results[c.name] = c;
+                    if (!results.ContainsKey(c.name))
+                        results[c.name] = c;
                 }
 
                 return results;
@@ -664,10 +668,10 @@ namespace Conductor.RegexTools
             string[] lines = selectedText.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             string start = lines[0].Replace(" ", "").Replace("\t", "");
-            string end = lines[lines.Length-1].Replace(" ", "").Replace("\t", "");
+            string end = lines[lines.Length - 1].Replace(" ", "").Replace("\t", "");
 
 
-            for (int lineIndex = 1; lineIndex < lines.Length-1; lineIndex++)
+            for (int lineIndex = 1; lineIndex < lines.Length - 1; lineIndex++)
 
             {
                 var line = lines[lineIndex];
@@ -680,7 +684,7 @@ namespace Conductor.RegexTools
                         string dataElementName = GetDataElementName(selectedText);
                         selectedText = selectedText.Replace(" ", "\\ ").Replace("\t", "\\t").Replace("(", "\\(").Replace(")", "\\)");
                         string regexFragment = @"(?<=" + start + @".*\n)" + selectedText + @":\s?(?<" + dataElementName + @">.*?)\r\n(?=.*?" + end + ")";
-                        pattern += ((pattern!="") ? "\r\n|\r\n": "(?x)\r\n"  ) + regexFragment;
+                        pattern += ((pattern != "") ? "\r\n|\r\n" : "(?x)\r\n") + regexFragment;
 
 
                         /* (? x)
@@ -689,10 +693,10 @@ namespace Conductor.RegexTools
 (?<= start.*\n)at2: (?< AT2 >.*?)\r\n(?=.*? end)
 */
                     }
-    }
+                }
                 else
                 {
-                  
+
                     //in the new model we'll ignore these
 
                 }
