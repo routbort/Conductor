@@ -1,21 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Sockets;
-using System.Threading;
 using System.Net.NetworkInformation;
-
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 
 namespace Conductor.Components
 {
     public class TelnetConnection : IDisposable
     {
-        private TcpClient tcpSocket;
-        private int TimeoutMs = 100;
+        #region Public Constructors
+
+        public TelnetConnection(string hostname, int port)
+        {
+            tcpSocket = new TcpClient(hostname, port);
+        }
+
+        #endregion Public Constructors
+
+        #region Public Delegates
+
         public delegate void DataReceivedEventHandler(string data);
+
+        #endregion Public Delegates
+
+        #region Public Events
+
         public event DataReceivedEventHandler DataReceived;
 
+        #endregion Public Events
+
+        #region Public Properties
 
         public bool IsConnected
         {
@@ -25,19 +40,12 @@ namespace Conductor.Components
             }
         }
 
-        public TelnetConnection(string hostname, int port)
-        {
-            tcpSocket = new TcpClient(hostname, port);
-        }
+        #endregion Public Properties
 
-        ~TelnetConnection()
-        {
-            Dispose(false);
-        }
+        #region Public Methods
 
         public static TelnetConnection GetLocalConnectionOnPort(int port)
         {
-
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
             foreach (NetworkInterface network in networkInterfaces)
                 if (network.OperationalStatus == OperationalStatus.Up)
@@ -52,7 +60,6 @@ namespace Conductor.Components
                             TelnetConnection tc = new TelnetConnection(address.Address.ToString(), port);
                             return tc;
                         }
-
                         catch (Exception ex)
                         {
                             System.Diagnostics.Debug.WriteLine("Could not bind on " + address.Address + ":" + port.ToString() + " - " + ex.Message);
@@ -61,18 +68,20 @@ namespace Conductor.Components
                 }
 
             return null;
-
-
         }
 
         public void Close()
         {
-
             //  this.tcpSocket.GetStream().Close();
             //   this.tcpSocket.Close();
-
-
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public string Login(string username, string password, int loginTimeoutMs)
         {
             int oldTimeoutMs = TimeoutMs;
@@ -101,22 +110,6 @@ namespace Conductor.Components
             return s;
         }
 
-        public void WriteLine(string cmd)
-        {
-            Write(cmd + "\n");
-        }
-
-        public void Write(string cmd)
-        {
-            if (!tcpSocket.Connected)
-            {
-                return;
-            }
-
-            byte[] buf = ASCIIEncoding.ASCII.GetBytes(cmd.Replace("\0xFF", "\0xFF\0xFF"));
-            tcpSocket.GetStream().Write(buf, 0, buf.Length);
-        }
-
         public string Read()
         {
             if (!tcpSocket.Connected)
@@ -129,7 +122,6 @@ namespace Conductor.Components
             {
                 ParseTelnet(sb);
                 Thread.Sleep(TimeoutMs);
-
             } while (tcpSocket.Available > 0);
 
             return sb.ToString();
@@ -152,7 +144,6 @@ namespace Conductor.Components
                     if (current.Contains("\r\n")) return current;
                 if (Environment.TickCount - startTime > Timeout) return null;
             }
-
         }
 
         public string ReadWaitForStrings(string input, List<string> options, int Timeout)
@@ -170,10 +161,79 @@ namespace Conductor.Components
             }
         }
 
+        public void Write(string cmd)
+        {
+            if (!tcpSocket.Connected)
+            {
+                return;
+            }
+
+            byte[] buf = ASCIIEncoding.ASCII.GetBytes(cmd.Replace("\0xFF", "\0xFF\0xFF"));
+            tcpSocket.GetStream().Write(buf, 0, buf.Length);
+        }
+
+        public void WriteLine(string cmd)
+        {
+            Write(cmd + "\n");
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (tcpSocket != null)
+                {
+                    ((IDisposable)tcpSocket).Dispose();
+                    tcpSocket = null;
+                }
+            }
+        }
+
+        #endregion Protected Methods
+
+        #region Private Fields
+
+        private TcpClient tcpSocket;
+        private int TimeoutMs = 100;
+
+        #endregion Private Fields
+
+        #region Private Destructors
+
+        ~TelnetConnection()
+        {
+            Dispose(false);
+        }
+
+        #endregion Private Destructors
+
+        #region Private Enums
+
+        private enum Options
+        {
+            Sga = 3
+        }
+
+        private enum Verbs
+        {
+            Will = 251,
+            Wont = 252,
+            Do = 253,
+            Dont = 254,
+            Iac = 255
+        }
+
+        #endregion Private Enums
+
+        #region Private Methods
+
         private void ParseTelnet(StringBuilder sb)
         {
             StringBuilder sbLog = new StringBuilder();
-
 
             while (tcpSocket.Available > 0)
             {
@@ -242,42 +302,6 @@ namespace Conductor.Components
             }
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-
-            if (disposing)
-            {
-                if (tcpSocket != null)
-                {
-
-                    ((IDisposable)tcpSocket).Dispose();
-                    tcpSocket = null;
-                }
-            }
-        }
-
-        #region Private Enums
-
-        enum Verbs
-        {
-            Will = 251,
-            Wont = 252,
-            Do = 253,
-            Dont = 254,
-            Iac = 255
-        }
-
-        enum Options
-        {
-            Sga = 3
-        }
-
-        #endregion
+        #endregion Private Methods
     }
 }

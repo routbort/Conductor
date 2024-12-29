@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Management;
-using System.Text;
 
 namespace Conductor.Components
 {
     public static class ProcessHelper
     {
+        #region Public Methods
 
-       public static Process GetParent(Process process)
+        public static Process GetParent(Process process)
         {
             try
             {
@@ -31,5 +29,7 @@ namespace Conductor.Components
                 return null;
             }
         }
+
+        #endregion Public Methods
     }
 }

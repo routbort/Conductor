@@ -69,6 +69,12 @@
     <Compile Include="Controls\DataGrid.Designer.cs">
       <DependentUpon>DataGrid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PropertyViewer2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PropertyViewer2.Designer.cs">
+      <DependentUpon>PropertyViewer2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TouchButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -132,6 +138,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\DataGrid.resx">
       <DependentUpon>DataGrid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PropertyViewer2.resx">
+      <DependentUpon>PropertyViewer2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TouchButtonContainer.resx">
       <DependentUpon>TouchButtonContainer.cs</DependentUpon>

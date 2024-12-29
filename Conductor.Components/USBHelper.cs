@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management;
-using System.Text;
+﻿using System.Management;
 
 namespace Conductor.Components
 {
     public static class USBHelper
     {
+        #region Public Methods
+
         public static bool IsSpecificDeviceAvailable(string DeviceID)
         {
             ManagementObjectCollection collection;
@@ -17,5 +15,7 @@ namespace Conductor.Components
                 return (collection.Count > 0);
             }
         }
+
+        #endregion Public Methods
     }
 }

@@ -5,11 +5,9 @@ using System.Linq;
 
 namespace Conductor.Components
 {
-    public class SortableBindingList<T> : BindingList<T> where T:class
+    public class SortableBindingList<T> : BindingList<T> where T : class
     {
-        private bool isSortedValue;
-        ListSortDirection sortDirectionValue;
-        PropertyDescriptor sortPropertyValue;
+        #region Public Constructors
 
         public SortableBindingList()
         {
@@ -22,6 +20,34 @@ namespace Conductor.Components
                 this.Add((T)o);
             }
         }
+
+        #endregion Public Constructors
+
+        #region Protected Properties
+
+        protected override bool IsSortedCore
+        {
+            get { return isSortedValue; }
+        }
+
+        protected override ListSortDirection SortDirectionCore
+        {
+            get { return sortDirectionValue; }
+        }
+
+        protected override PropertyDescriptor SortPropertyCore
+        {
+            get { return sortPropertyValue; }
+        }
+
+        protected override bool SupportsSortingCore
+        {
+            get { return true; }
+        }
+
+        #endregion Protected Properties
+
+        #region Protected Methods
 
         protected override void ApplySortCore(PropertyDescriptor prop,
             ListSortDirection direction)
@@ -72,24 +98,14 @@ namespace Conductor.Components
             }
         }
 
-        protected override PropertyDescriptor SortPropertyCore
-        {
-            get { return sortPropertyValue; }
-        }
+        #endregion Protected Methods
 
-        protected override ListSortDirection SortDirectionCore
-        {
-            get { return sortDirectionValue; }
-        }
+        #region Private Fields
 
-        protected override bool SupportsSortingCore
-        {
-            get { return true; }
-        }
+        private bool isSortedValue;
+        private ListSortDirection sortDirectionValue;
+        private PropertyDescriptor sortPropertyValue;
 
-        protected override bool IsSortedCore
-        {
-            get { return isSortedValue; }
-        }
+        #endregion Private Fields
     }
 }
